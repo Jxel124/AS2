@@ -1,3 +1,6 @@
+// This variable tells us whether the game has started yet
+let gameStarted = false;
+
 let upPressed = false;
 let downPressed = false;
 let leftPressed = false;
@@ -48,6 +51,15 @@ for (let y of maze) {
     }
 }
 
+// Handles what happens when the Start button is clicked
+const startBtn = document.querySelector('#startBtn');
+const startScreen = document.querySelector('#startScreen');
+
+startBtn.addEventListener('click', () => {
+    gameStarted = true; // Allow game actions
+    startScreen.style.display = 'none'; // Hide the start screen
+});
+
 //Player movement
 function keyUp(event) {
     if (event.key === 'ArrowUp') {
@@ -62,6 +74,9 @@ function keyUp(event) {
 }
 
 function keyDown(event) {
+    // Prevents movement keys from working if game hasn't started
+    if (!gameStarted) return;
+
     if (event.key === 'ArrowUp') {
         upPressed = true;
     } else if (event.key === 'ArrowDown') {
@@ -78,23 +93,26 @@ const playerMouth = player.querySelector('.mouth');
 let playerTop = 0;
 let playerLeft = 0;
 
-setInterval(function() {
-    if(downPressed) {
+setInterval(function () {
+    // If the game hasn't started, don't move the player at all
+    if (!gameStarted) return;
+
+    if (downPressed) {
         playerTop++;
         player.style.top = playerTop + 'px';
         playerMouth.classList = 'down';
     }
-    else if(upPressed) {
+    else if (upPressed) {
         playerTop--;
         player.style.top = playerTop + 'px';
         playerMouth.classList = 'up';
     }
-    else if(leftPressed) {
+    else if (leftPressed) {
         playerLeft--;
         player.style.left = playerLeft + 'px';
         playerMouth.classList = 'left';
     }
-    else if(rightPressed) {
+    else if (rightPressed) {
         playerLeft++;
         player.style.left = playerLeft + 'px';
         playerMouth.classList = 'right';
