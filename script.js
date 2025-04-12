@@ -92,14 +92,34 @@ const player = document.querySelector('#player');
 const playerMouth = player.querySelector('.mouth');
 let playerTop = 0;
 let playerLeft = 0;
+let score = 0; // Tracks how many points have been collected
 
 setInterval(function () {
     // If the game hasn't started, don't move the player at all
     if (!gameStarted) return;
 
+    // This section checks if the player is overlapping a point
+    let position = player.getBoundingClientRect();
+    let centerX = (position.left + position.right) / 2;
+    let centerY = (position.top + position.bottom) / 2;
+
+    let elementAtCenter = document.elementFromPoint(centerX, centerY);
+
+    // If the player is on a point, remove it and update the score
+    if (elementAtCenter && elementAtCenter.classList.contains('point')) {
+        elementAtCenter.remove();
+        score++;
+        document.querySelector('.score p').textContent = score;
+
+        // If all points are collected, end the game
+        if (document.querySelectorAll('.point').length === 0) {
+            alert("You collected all the points! Game Over!");
+            location.reload(); // For now, this just reloads the game
+        }
+    }
+
     // Check collision when moving down
     if (downPressed) {
-        let position = player.getBoundingClientRect();
         let newBottom = position.bottom + 1;
 
         let leftCheck = document.elementFromPoint(position.left, newBottom);
@@ -115,7 +135,6 @@ setInterval(function () {
 
     // Check collision when moving up
     else if (upPressed) {
-        let position = player.getBoundingClientRect();
         let newTop = position.top - 1;
 
         let leftCheck = document.elementFromPoint(position.left, newTop);
@@ -131,7 +150,6 @@ setInterval(function () {
 
     // Check collision when moving left
     else if (leftPressed) {
-        let position = player.getBoundingClientRect();
         let newLeft = position.left - 1;
 
         let topCheck = document.elementFromPoint(newLeft, position.top);
@@ -147,7 +165,6 @@ setInterval(function () {
 
     // Check collision when moving right
     else if (rightPressed) {
-        let position = player.getBoundingClientRect();
         let newRight = position.right + 1;
 
         let topCheck = document.elementFromPoint(newRight, position.top);
