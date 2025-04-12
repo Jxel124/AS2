@@ -98,24 +98,32 @@ setInterval(function () {
     // If the game hasn't started, don't move the player at all
     if (!gameStarted) return;
 
-    // This section checks if the player is overlapping a point
+    // Get the current position of the player
     let position = player.getBoundingClientRect();
-    let centerX = (position.left + position.right) / 2;
-    let centerY = (position.top + position.bottom) / 2;
 
-    let elementAtCenter = document.elementFromPoint(centerX, centerY);
+    // Go through every point and check if it overlaps with the player
+    const allPoints = document.querySelectorAll('.point');
+    allPoints.forEach(point => {
+        const pointPos = point.getBoundingClientRect();
 
-    // If the player is on a point, remove it and update the score
-    if (elementAtCenter && elementAtCenter.classList.contains('point')) {
-        elementAtCenter.remove();
-        score++;
-        document.querySelector('.score p').textContent = score;
+        // Basic rectangle overlap logic — checks if two elements touch
+        const isColliding =
+            position.right > pointPos.left &&
+            position.left < pointPos.right &&
+            position.bottom > pointPos.top &&
+            position.top < pointPos.bottom;
 
-        // If all points are collected, end the game
-        if (document.querySelectorAll('.point').length === 0) {
-            alert("You collected all the points! Game Over!");
-            location.reload(); // For now, this just reloads the game
+        if (isColliding) {
+            point.remove(); // Remove the collected point
+            score++; // Increase the score
+            document.querySelector('.score p').textContent = score; // Update the UI
         }
+    });
+
+    // If all the points are gone, end the game
+    if (document.querySelectorAll('.point').length === 0) {
+        alert("You collected all the points! Game Over!");
+        location.reload(); // Just restart for now
     }
 
     // Check collision when moving down
