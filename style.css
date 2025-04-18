@@ -66,6 +66,13 @@ main {
     justify-items: center;
 }
 
+/* Ensures each grid block can center its content */
+.block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 /* Lives styling */
 .lives {
     position: absolute;
@@ -140,9 +147,12 @@ div p {
     position: relative;
 }
 
+/* Dot that represents a point to collect */
 .point {
     border-radius: 100%;
     background-color: white;
+    width: 8px;
+    height: 8px;
 }
 
 .wall {
@@ -196,31 +206,20 @@ button:nth-child(3) { grid-area: rightArrow; }
 button:nth-child(4) { grid-area: downArrow; }
 
 @keyframes deathAnimation {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(0.5);
-    }
-
-    100% {
-        transform: scale(0);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(0.5); }
+    100% { transform: scale(0); }
 }
 
 @keyframes hitAnimation {
-
     0%, 100% {
         background-color: yellow;
         transform: scale(1);
     }
-
     50% {
         background-color: red;
         transform: scale(0.75);
     }
-    
 }
 
 .dead {
