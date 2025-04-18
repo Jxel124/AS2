@@ -100,6 +100,9 @@ let playerTop = 0;
 let playerLeft = 0;
 let score = 0; // Keeps track of how many points the player has collected
 
+let lives = 3; // How many chances the player has before it's game over
+let canMove = true; // Temporarily freezes the player after being hit
+
 // This loop constantly checks for movement and point collection
 setInterval(function () {
     // Block everything until the start button has been clicked
@@ -132,8 +135,24 @@ setInterval(function () {
         location.reload();
     }
 
+    // Check if the player has run into an enemy
+    const allEnemies = document.querySelectorAll('.enemy');
+    allEnemies.forEach(enemy => {
+        const enemyPos = enemy.getBoundingClientRect();
+
+        const isTouchingEnemy =
+            position.right > enemyPos.left &&
+            position.left < enemyPos.right &&
+            position.bottom > enemyPos.top &&
+            position.top < enemyPos.bottom;
+
+        if (isTouchingEnemy && canMove) {
+            handleEnemyCollision(); // Trigger collision reaction
+        }
+    });
+
     // Check collision when moving down
-    if (downPressed) {
+    if (downPressed && canMove) {
         let newBottom = position.bottom + 1;
 
         let leftCheck = document.elementFromPoint(position.left, newBottom);
@@ -148,7 +167,7 @@ setInterval(function () {
     }
 
     // Check collision when moving up
-    else if (upPressed) {
+    else if (upPressed && canMove) {
         let newTop = position.top - 1;
 
         let leftCheck = document.elementFromPoint(position.left, newTop);
@@ -163,7 +182,7 @@ setInterval(function () {
     }
 
     // Check collision when moving left
-    else if (leftPressed) {
+    else if (leftPressed && canMove) {
         let newLeft = position.left - 1;
 
         let topCheck = document.elementFromPoint(newLeft, position.top);
@@ -178,7 +197,7 @@ setInterval(function () {
     }
 
     // Check collision when moving right
-    else if (rightPressed) {
+    else if (rightPressed && canMove) {
         let newRight = position.right + 1;
 
         let topCheck = document.elementFromPoint(newRight, position.top);
@@ -196,3 +215,30 @@ setInterval(function () {
 // These listeners check if a key is being held or released
 document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
+
+// Handles what happens when the player touches an enemy
+function handleEnemyCollision() {
+    lives--; // Reduce the life count
+    canMove = false; // Freeze player temporarily
+
+    player.classList.add('hit'); // Show the hit effect
+
+    // Make one of the life circles disappear from the top-right
+    const lifeIcons = document.querySelectorAll('.lives li');
+    if (lifeIcons[lives]) {
+        lifeIcons[lives].style.backgroundColor = 'transparent';
+    }
+
+    // After the hit animation, allow player to move again or end game
+    setTimeout(() => {
+        player.classList.remove('hit');
+        canMove = true;
+
+        if (lives <= 0) {
+            const restart = confirm("Game Over! Restart?");
+            if (restart) {
+                location.reload();
+            }
+        }
+    }, 1500);
+}
