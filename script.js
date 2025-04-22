@@ -44,6 +44,8 @@ for (let row = 0; row < maze.length; row++) {
         break;
       case 3:
         block.classList.add('enemy');
+        block.style.gridRowStart = row + 1;
+        block.style.gridColumnStart = col + 1;
         break;
       default:
         block.classList.add('point');
@@ -81,7 +83,6 @@ function keyDown(event) {
   else if (event.key === 'ArrowRight') rightPressed = true;
 }
 
-// Player reference and initial position
 const player = document.querySelector('#player');
 const playerMouth = player.querySelector('.mouth');
 let playerTop = 0;
@@ -171,6 +172,56 @@ setInterval(() => {
     playerMouth.className = 'right';
   }
 }, 10);
+
+// Enemy chasing logic
+setInterval(() => {
+  if (!gameStarted) return;
+
+  const playerPos = getPlayerGridPos();
+
+  document.querySelectorAll('.enemy').forEach(enemy => {
+    const enemyPos = getGridPos(enemy);
+    const direction = getNextStepTowardPlayer(enemyPos, playerPos);
+    const newY = enemyPos.y + direction.y;
+    const newX = enemyPos.x + direction.x;
+
+    if (maze[newY][newX] !== 1) {
+      enemy.style.gridRowStart = newY + 1;
+      enemy.style.gridColumnStart = newX + 1;
+    }
+  });
+}, 500);
+
+// Find the player's current position in the maze
+function getPlayerGridPos() {
+  for (let y = 0; y < maze.length; y++) {
+    for (let x = 0; x < maze[y].length; x++) {
+      if (maze[y][x] === 2) return { y, x };
+    }
+  }
+}
+
+// Get an enemy's current grid position
+function getGridPos(enemy) {
+  return {
+    y: parseInt(enemy.style.gridRowStart) - 1,
+    x: parseInt(enemy.style.gridColumnStart) - 1
+  };
+}
+
+// Decide the next direction that brings the enemy closer to the player
+function getNextStepTowardPlayer(from, to) {
+  const dy = to.y - from.y;
+  const dx = to.x - from.x;
+
+  if (Math.abs(dy) > Math.abs(dx)) {
+    return { y: dy > 0 ? 1 : -1, x: 0 };
+  } else if (dx !== 0) {
+    return { y: 0, x: dx > 0 ? 1 : -1 };
+  } else {
+    return { y: 0, x: 0 };
+  }
+}
 
 // These listeners check if a key is being held or released
 document.addEventListener('keydown', keyDown);
