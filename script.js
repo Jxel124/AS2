@@ -190,7 +190,7 @@ setInterval(() => {
       enemy.style.gridColumnStart = newX + 1;
     }
   });
-}, 500);
+}, 1500);
 
 // Find the player's current position in the maze
 function getPlayerGridPos() {
