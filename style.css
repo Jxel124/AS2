@@ -72,7 +72,7 @@ header h1 {
   height: 80vh;
   position: relative;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: hidden; /* Prevent player from visually leaving the area */
 }
 
 /* Maze grid structure */
@@ -290,3 +290,4 @@ button:nth-child(4) { grid-area: downArrow; }
   margin-left: 10px;
   width: 200px;
 }
+
