@@ -34,16 +34,16 @@ startBtn.addEventListener('click', () => {
 
 // Maze layout: Player = 2, Wall = 1, Enemy = 3, Point = 0
 let maze = [
-  [1,1,1,1,1,1,1,1,1,1],
-  [1,2,0,1,0,0,0,0,3,1],
-  [1,0,0,0,0,0,0,1,1,1],
-  [1,0,0,0,0,0,0,0,0,1],
-  [1,0,1,1,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,1,1,1],
-  [1,0,0,1,0,3,0,0,0,1],
-  [1,0,0,0,0,0,0,1,0,1],
-  [1,3,1,0,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1]
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 2, 0, 1, 0, 0, 0, 0, 3, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+  [1, 0, 0, 1, 0, 3, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+  [1, 3, 1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
 // Populates the maze in the HTML
@@ -93,6 +93,7 @@ setInterval(() => {
   let nextRow = playerTop;
   let nextCol = playerLeft;
 
+  // Movement: making sure movement is smooth and sliding
   if (downPressed) {
     nextRow++;
     playerMouth.className = 'mouth down';
@@ -107,6 +108,7 @@ setInterval(() => {
     playerMouth.className = 'mouth right';
   }
 
+  // Check for wall collision
   if (maze[nextRow][nextCol] !== 1) {
     playerTop = nextRow;
     playerLeft = nextCol;
@@ -132,14 +134,14 @@ setInterval(() => {
     }
   });
 
-  // Check win condition
+  // Check win condition (when all points are collected)
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
     location.reload();
   }
 
-  // Check for enemy collision
+  // Check if player touches an enemy
   document.querySelectorAll('.enemy').forEach(enemy => {
     const enemyBox = enemy.getBoundingClientRect();
     const isTouchingEnemy = (
@@ -152,9 +154,9 @@ setInterval(() => {
       handleEnemyCollision();
     }
   });
-}, 200); // Smooth step-like motion
+}, 180); // Slightly slower movement speed
 
-// Moves each enemy toward the player every half second
+// AI movement: enemies chase the player every 0.5s
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -181,9 +183,9 @@ setInterval(() => {
       enemy.style.gridColumnStart = newX + 1;
     }
   });
-}, 500);
+}, 500); // AI moves every 0.5s
 
-// Runs when the player hits an enemy
+// Runs when the player touches an enemy
 function handleEnemyCollision() {
   lives--;
   canMove = false;
@@ -203,7 +205,7 @@ function handleEnemyCollision() {
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
-  }, 1000); // Animation time
+  }, 1000); // Animation time for hit effect
 }
 
 // Save leaderboard to localStorage
