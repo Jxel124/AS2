@@ -33,7 +33,7 @@ startBtn.addEventListener('click', () => {
   playerName = nameInput.value.trim();
   gameStarted = true;
   startScreen.style.display = 'none';
-  movePlayerToGrid(); // places player at initial position
+  movePlayerToGrid();
 });
 
 // Maze layout: Player = 2, Wall = 1, Enemy = 3, Point = 0
