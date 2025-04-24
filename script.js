@@ -105,26 +105,36 @@ function glideMove() {
   let moveX = 0;
   let moveY = 0;
 
-  if (upPressed)    moveY = -speed;
-  if (downPressed)  moveY = speed;
-  if (leftPressed)  moveX = -speed;
+  if (upPressed) moveY = -speed;
+  if (downPressed) moveY = speed;
+  if (leftPressed) moveX = -speed;
   if (rightPressed) moveX = speed;
 
-  const checkX = player.offsetLeft + moveX + player.offsetWidth / 2;
-  const checkY = player.offsetTop + moveY + player.offsetHeight / 2;
+  const newLeft = player.offsetLeft + moveX;
+  const newTop = player.offsetTop + moveY;
 
-  const el = document.elementFromPoint(checkX, checkY);
-  const isBlocked = el && el.classList.contains('wall');
+  // Calculates the grid cell the player would move into
+  const cellWidth = main.offsetWidth / 10;
+  const cellHeight = main.offsetHeight / 10;
+  const colIndex = Math.floor((newLeft + player.offsetWidth / 2) / cellWidth);
+  const rowIndex = Math.floor((newTop + player.offsetHeight / 2) / cellHeight);
 
-  if (!isBlocked) {
-    player.style.left = player.offsetLeft + moveX + 'px';
-    player.style.top = player.offsetTop + moveY + 'px';
+  // Prevents movement if the next position is outside the maze or a wall
+  if (
+    rowIndex >= 0 &&
+    rowIndex < maze.length &&
+    colIndex >= 0 &&
+    colIndex < maze[0].length &&
+    maze[rowIndex][colIndex] !== 1
+  ) {
+    player.style.left = newLeft + 'px';
+    player.style.top = newTop + 'px';
+
+    if (moveX > 0) playerMouth.className = 'mouth right';
+    else if (moveX < 0) playerMouth.className = 'mouth left';
+    else if (moveY < 0) playerMouth.className = 'mouth up';
+    else if (moveY > 0) playerMouth.className = 'mouth down';
   }
-
-  if (moveX > 0)      playerMouth.className = 'mouth right';
-  else if (moveX < 0) playerMouth.className = 'mouth left';
-  else if (moveY < 0) playerMouth.className = 'mouth up';
-  else if (moveY > 0) playerMouth.className = 'mouth down';
 
   checkPointCollision();
   checkEnemyCollision();
