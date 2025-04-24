@@ -23,6 +23,19 @@ let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
+let playerName = ""; // Stores the player's name
+
+// These keep track of where the player is in the grid (row and column)
+let playerTop = 1;
+let playerLeft = 1;
+
+let score = 0;
+let lives = 3;
+let canMove = true;
+
+const player = document.querySelector('#player');
+const playerMouth = document.querySelector('.mouth');
+
 // Populates the maze in the HTML
 for (let row = 0; row < maze.length; row++) {
   for (let col = 0; col < maze[row].length; col++) {
@@ -41,6 +54,8 @@ for (let row = 0; row < maze.length; row++) {
         let mouth = document.createElement('div');
         mouth.classList.add('mouth');
         block.appendChild(mouth);
+        playerTop = row;
+        playerLeft = col;
         break;
       case 3:
         block.classList.add('enemy');
@@ -60,8 +75,14 @@ for (let row = 0; row < maze.length; row++) {
 // Handles what happens when the Start button is clicked
 const startBtn = document.querySelector('#startBtn');
 const startScreen = document.querySelector('#startScreen');
+const nameInput = document.querySelector('#playerNameInput');
 
 startBtn.addEventListener('click', () => {
+  if (nameInput.value.trim() === "") {
+    alert("Please enter your name!");
+    return;
+  }
+  playerName = nameInput.value.trim(); // Save the entered name
   gameStarted = true;
   startScreen.style.display = 'none';
 });
@@ -82,14 +103,6 @@ function keyDown(event) {
   else if (event.key === 'ArrowLeft') leftPressed = true;
   else if (event.key === 'ArrowRight') rightPressed = true;
 }
-
-const player = document.querySelector('#player');
-const playerMouth = player.querySelector('.mouth');
-let playerTop = 0;
-let playerLeft = 0;
-let score = 0;
-let lives = 3;
-let canMove = true;
 
 // Constant loop to check for movement and interactions
 setInterval(() => {
@@ -115,6 +128,7 @@ setInterval(() => {
 
   // Win condition
   if (document.querySelectorAll('.point').length === 0) {
+    saveHighScore();
     alert("You collected all the points! Game Over!");
     location.reload();
   }
@@ -133,44 +147,15 @@ setInterval(() => {
     }
   });
 
-  // Movement logic
-  if (downPressed) {
-    let newBottom = position.bottom + 1;
-    let leftCheck = document.elementFromPoint(position.left, newBottom);
-    let rightCheck = document.elementFromPoint(position.right, newBottom);
-    if (!leftCheck?.classList.contains('wall') && !rightCheck?.classList.contains('wall')) {
-      playerTop++;
-      player.style.top = playerTop + 'px';
-    }
-    playerMouth.className = 'down';
-  } else if (upPressed) {
-    let newTop = position.top - 1;
-    let leftCheck = document.elementFromPoint(position.left, newTop);
-    let rightCheck = document.elementFromPoint(position.right, newTop);
-    if (!leftCheck?.classList.contains('wall') && !rightCheck?.classList.contains('wall')) {
-      playerTop--;
-      player.style.top = playerTop + 'px';
-    }
-    playerMouth.className = 'up';
-  } else if (leftPressed) {
-    let newLeft = position.left - 1;
-    let topCheck = document.elementFromPoint(newLeft, position.top);
-    let bottomCheck = document.elementFromPoint(newLeft, position.bottom);
-    if (!topCheck?.classList.contains('wall') && !bottomCheck?.classList.contains('wall')) {
-      playerLeft--;
-      player.style.left = playerLeft + 'px';
-    }
-    playerMouth.className = 'left';
-  } else if (rightPressed) {
-    let newRight = position.right + 1;
-    let topCheck = document.elementFromPoint(newRight, position.top);
-    let bottomCheck = document.elementFromPoint(newRight, position.bottom);
-    if (!topCheck?.classList.contains('wall') && !bottomCheck?.classList.contains('wall')) {
-      playerLeft++;
-      player.style.left = playerLeft + 'px';
-    }
-    playerMouth.className = 'right';
-  }
+  // Move the player in the direction they're pressing
+  if (downPressed) playerTop++;
+  else if (upPressed) playerTop--;
+  else if (leftPressed) playerLeft--;
+  else if (rightPressed) playerLeft++;
+
+  // Apply movement to grid layout
+  player.style.gridRowStart = playerTop + 1;
+  player.style.gridColumnStart = playerLeft + 1;
 }, 10);
 
 // Enemy chasing logic
@@ -192,7 +177,7 @@ setInterval(() => {
   });
 }, 1500);
 
-// Find the player's current position in the maze
+// Get player's grid position from the maze
 function getPlayerGridPos() {
   for (let y = 0; y < maze.length; y++) {
     for (let x = 0; x < maze[y].length; x++) {
@@ -201,7 +186,7 @@ function getPlayerGridPos() {
   }
 }
 
-// Get an enemy's current grid position
+// Get grid position of an enemy using its grid position
 function getGridPos(enemy) {
   return {
     y: parseInt(enemy.style.gridRowStart) - 1,
@@ -209,7 +194,7 @@ function getGridPos(enemy) {
   };
 }
 
-// Decide the next direction that brings the enemy closer to the player
+// Calculate which direction the enemy should move to get closer to the player
 function getNextStepTowardPlayer(from, to) {
   const dy = to.y - from.y;
   const dx = to.x - from.x;
@@ -243,9 +228,34 @@ function handleEnemyCollision() {
     canMove = true;
 
     if (lives <= 0) {
+      saveHighScore();
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
   }, 1500);
 }
+
+// Save score to localStorage leaderboard
+function saveHighScore() {
+  let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+  scores.push({ name: playerName, score: score });
+  scores.sort((a, b) => b.score - a.score);
+  scores = scores.slice(0, 5);
+  localStorage.setItem("leaderboard", JSON.stringify(scores));
+}
+
+// Load leaderboard from localStorage and show it on the page
+function loadLeaderboard() {
+  const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+  const list = document.getElementById("leaderboardList");
+  if (!list) return;
+  list.innerHTML = "";
+  scores.forEach(entry => {
+    const li = document.createElement("li");
+    li.textContent = `${entry.name}........${entry.score}`;
+    list.appendChild(li);
+  });
+}
+
+loadLeaderboard();
 
