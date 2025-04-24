@@ -10,9 +10,12 @@ let rightPressed = false;
 let score = 0;
 let lives = 3;
 let canMove = true;
+
+// These store the player's position in rows and columns (used to calculate initial spawn)
 let playerTop = 0;
 let playerLeft = 0;
 
+// Stores the player's name from input
 let playerName = "";
 
 const main = document.querySelector('main');
@@ -77,111 +80,103 @@ for (let row = 0; row < maze.length; row++) {
 const player = document.getElementById('player');
 const playerMouth = player.querySelector('.mouth');
 
+// Set initial pixel position based on spawn point
+player.style.position = 'absolute';
+player.style.left = player.offsetLeft + 'px';
+player.style.top = player.offsetTop + 'px';
+
 // Handles key presses
 document.addEventListener('keydown', (e) => {
   if (!gameStarted) return;
-  if (e.key === 'ArrowUp') { upPressed = true; downPressed = leftPressed = rightPressed = false; }
-  if (e.key === 'ArrowDown') { downPressed = true; upPressed = leftPressed = rightPressed = false; }
-  if (e.key === 'ArrowLeft') { leftPressed = true; upPressed = downPressed = rightPressed = false; }
+  if (e.key === 'ArrowUp')    { upPressed = true; downPressed = leftPressed = rightPressed = false; }
+  if (e.key === 'ArrowDown')  { downPressed = true; upPressed = leftPressed = rightPressed = false; }
+  if (e.key === 'ArrowLeft')  { leftPressed = true; upPressed = downPressed = rightPressed = false; }
   if (e.key === 'ArrowRight') { rightPressed = true; upPressed = downPressed = leftPressed = false; }
 });
 
-// Gliding-style movement happens repeatedly as long as a key is held
-setInterval(() => {
-  if (!gameStarted || !canMove) return;
-
-  let nextRow = playerTop;
-  let nextCol = playerLeft;
-
-  if (downPressed) {
-    nextRow++;
-    playerMouth.className = 'mouth down';
-  } else if (upPressed) {
-    nextRow--;
-    playerMouth.className = 'mouth up';
-  } else if (leftPressed) {
-    nextCol--;
-    playerMouth.className = 'mouth left';
-  } else if (rightPressed) {
-    nextCol++;
-    playerMouth.className = 'mouth right';
+// This function moves the player a few pixels per frame, based on held key
+function glideMove() {
+  if (!gameStarted || !canMove) {
+    requestAnimationFrame(glideMove);
+    return;
   }
 
-  if (maze[nextRow][nextCol] !== 1) {
-    playerTop = nextRow;
-    playerLeft = nextCol;
-    player.style.gridRowStart = playerTop + 1;
-    player.style.gridColumnStart = playerLeft + 1;
+  let speed = 2; // pixels per frame
+  let moveX = 0;
+  let moveY = 0;
+
+  if (upPressed)    moveY = -speed;
+  if (downPressed)  moveY = speed;
+  if (leftPressed)  moveX = -speed;
+  if (rightPressed) moveX = speed;
+
+  // Midpoint of where player would move next
+  const futureX = player.offsetLeft + moveX + player.offsetWidth / 2;
+  const futureY = player.offsetTop + moveY + player.offsetHeight / 2;
+
+  const el = document.elementFromPoint(futureX, futureY);
+  const isBlocked = el && el.classList.contains('wall');
+
+  if (!isBlocked) {
+    player.style.left = player.offsetLeft + moveX + 'px';
+    player.style.top = player.offsetTop + moveY + 'px';
   }
 
+  // Changes the mouth direction to match input
+  if (moveX > 0)      playerMouth.className = 'mouth right';
+  else if (moveX < 0) playerMouth.className = 'mouth left';
+  else if (moveY < 0) playerMouth.className = 'mouth up';
+  else if (moveY > 0) playerMouth.className = 'mouth down';
+
+  checkPointCollision();
+  checkEnemyCollision();
+  requestAnimationFrame(glideMove);
+}
+
+requestAnimationFrame(glideMove); // Starts the smooth movement loop
+
+// Checks if the player overlaps a point and removes it
+function checkPointCollision() {
   const playerBox = player.getBoundingClientRect();
 
-  // Check for collision with point
   document.querySelectorAll('.point').forEach(point => {
-    const pointBox = point.getBoundingClientRect();
-    const isColliding = (
-      playerBox.right > pointBox.left &&
-      playerBox.left < pointBox.right &&
-      playerBox.bottom > pointBox.top &&
-      playerBox.top < pointBox.bottom
+    const box = point.getBoundingClientRect();
+    const touching = (
+      playerBox.right > box.left &&
+      playerBox.left < box.right &&
+      playerBox.bottom > box.top &&
+      playerBox.top < box.bottom
     );
-    if (isColliding) {
+    if (touching) {
       point.remove();
       score++;
       scoreDisplay.textContent = score;
     }
   });
 
-  // End game if all points collected
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
     location.reload();
   }
+}
 
-  // Check if player touches an enemy
+// Checks if the player has touched an enemy
+function checkEnemyCollision() {
+  const playerBox = player.getBoundingClientRect();
   document.querySelectorAll('.enemy').forEach(enemy => {
-    const enemyBox = enemy.getBoundingClientRect();
-    const isTouchingEnemy = (
-      playerBox.right > enemyBox.left &&
-      playerBox.left < enemyBox.right &&
-      playerBox.bottom > enemyBox.top &&
-      playerBox.top < enemyBox.bottom
+    const box = enemy.getBoundingClientRect();
+    const colliding = (
+      playerBox.right > box.left &&
+      playerBox.left < box.right &&
+      playerBox.bottom > box.top &&
+      playerBox.top < box.bottom
     );
-    if (isTouchingEnemy) {
+    if (colliding) {
       handleEnemyCollision();
     }
   });
-}, 150); // Runs faster for smoother movement
-
-// AI movement — each enemy chooses a random direction that avoids walls
-setInterval(() => {
-  if (!gameStarted) return;
-
-  const directions = [
-    { row: -1, col: 0 }, // up
-    { row: 1, col: 0 },  // down
-    { row: 0, col: -1 }, // left
-    { row: 0, col: 1 }   // right
-  ];
-
-  document.querySelectorAll('.enemy').forEach(enemy => {
-    const currentRow = parseInt(enemy.style.gridRowStart) - 1;
-    const currentCol = parseInt(enemy.style.gridColumnStart) - 1;
-
-    const options = directions.filter(d => {
-      const r = currentRow + d.row;
-      const c = currentCol + d.col;
-      return maze[r][c] !== 1;
-    });
-
-    if (options.length > 0) {
-      const move = options[Math.floor(Math.random() * options.length)];
-      enemy.style.gridRowStart = currentRow + move.row + 1;
-      enemy.style.gridColumnStart = currentCol + move.col + 1;
-    }
-  });
-}, 500); // Enemies move every half second
+}
 
 // Runs when the player touches an enemy
 function handleEnemyCollision() {
@@ -203,13 +198,42 @@ function handleEnemyCollision() {
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
-  }, 1000); // Pause briefly after hit
+  }, 1000);
 }
+
+// AI movement — enemies pick random valid directions
+setInterval(() => {
+  if (!gameStarted) return;
+
+  const directions = [
+    { row: -1, col: 0 },
+    { row: 1, col: 0 },
+    { row: 0, col: -1 },
+    { row: 0, col: 1 }
+  ];
+
+  document.querySelectorAll('.enemy').forEach(enemy => {
+    const row = parseInt(enemy.style.gridRowStart) - 1;
+    const col = parseInt(enemy.style.gridColumnStart) - 1;
+
+    const options = directions.filter(d => {
+      const r = row + d.row;
+      const c = col + d.col;
+      return maze[r] && maze[r][c] !== 1;
+    });
+
+    if (options.length > 0) {
+      const move = options[Math.floor(Math.random() * options.length)];
+      enemy.style.gridRowStart = row + move.row + 1;
+      enemy.style.gridColumnStart = col + move.col + 1;
+    }
+  });
+}, 500);
 
 // Save leaderboard to localStorage
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
-  scores.push({ name: playerName, score: score });
+  scores.push({ name: playerName, score });
   scores.sort((a, b) => b.score - a.score);
   scores = scores.slice(0, 5);
   localStorage.setItem("leaderboard", JSON.stringify(scores));
