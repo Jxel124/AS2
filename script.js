@@ -86,7 +86,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { rightPressed = true; upPressed = downPressed = leftPressed = false; }
 });
 
-// Player movement loop (gliding effect)
+// Game loop: manages movement, collision, scoring
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
@@ -116,7 +116,7 @@ setInterval(() => {
 
   const playerBox = player.getBoundingClientRect();
 
-  // Check for point collection
+  // Point collection logic
   document.querySelectorAll('.point').forEach(point => {
     const pointBox = point.getBoundingClientRect();
     const isColliding = (
@@ -132,7 +132,7 @@ setInterval(() => {
     }
   });
 
-  // Check win condition (all points eaten)
+  // Check win condition
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
@@ -152,9 +152,9 @@ setInterval(() => {
       handleEnemyCollision();
     }
   });
-}, 180); // Adjust this interval for smoother or faster movement
+}, 200); // Smooth step-like motion
 
-// Simple AI for enemy to follow the player
+// Moves each enemy toward the player every half second
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -181,9 +181,9 @@ setInterval(() => {
       enemy.style.gridColumnStart = newX + 1;
     }
   });
-}, 500); // Enemy moves every 0.5s
+}, 500);
 
-// Handle what happens when the player touches an enemy
+// Runs when the player hits an enemy
 function handleEnemyCollision() {
   lives--;
   canMove = false;
@@ -203,10 +203,10 @@ function handleEnemyCollision() {
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
-  }, 1500); // Animation duration
+  }, 1000); // Animation time
 }
 
-// Save the player's score to localStorage
+// Save leaderboard to localStorage
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   scores.push({ name: playerName, score: score });
@@ -215,7 +215,7 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
-// Load the leaderboard on game startup
+// Load the scores on startup
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
