@@ -110,28 +110,15 @@ function glideMove() {
   if (leftPressed)  moveX = -speed;
   if (rightPressed) moveX = speed;
 
-  const gameArea = document.querySelector('.gameArea').getBoundingClientRect();
-  const newLeft = player.offsetLeft + moveX;
-  const newTop = player.offsetTop + moveY;
-  const newRight = newLeft + player.offsetWidth;
-  const newBottom = newTop + player.offsetHeight;
+  const checkX = player.offsetLeft + moveX + player.offsetWidth / 2;
+  const checkY = player.offsetTop + moveY + player.offsetHeight / 2;
 
-  const insideBounds =
-    newLeft >= 0 &&
-    newTop >= 0 &&
-    newRight <= gameArea.width &&
-    newBottom <= gameArea.height;
+  const el = document.elementFromPoint(checkX, checkY);
+  const isBlocked = el && el.classList.contains('wall');
 
-  if (insideBounds) {
-    const checkX = newLeft + player.offsetWidth / 2;
-    const checkY = newTop + player.offsetHeight / 2;
-    const el = document.elementFromPoint(checkX, checkY);
-    const isBlocked = el && el.classList.contains('wall');
-
-    if (!isBlocked) {
-      player.style.left = newLeft + 'px';
-      player.style.top = newTop + 'px';
-    }
+  if (!isBlocked) {
+    player.style.left = player.offsetLeft + moveX + 'px';
+    player.style.top = player.offsetTop + moveY + 'px';
   }
 
   if (moveX > 0)      playerMouth.className = 'mouth right';
