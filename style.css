@@ -171,8 +171,8 @@ main {
 #player {
   background-color: yellow;
   border-radius: 100%;
-  width: 90%; /* Player size updated to match enemy size */
-  height: 90%; /* Player size updated to match enemy size */
+  width: 40px; /* Correct player size */
+  height: 40px; /* Correct player size */
   position: absolute;
   z-index: 10;
   transition: top 0.15s ease, left 0.15s ease; /* Smooth movement transition */
