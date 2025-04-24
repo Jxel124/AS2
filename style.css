@@ -57,15 +57,16 @@ header h1 {
   font-size: 4em;
 }
 
-/* Container for grid and player positioning */
+/* Container that holds both the grid and player */
 .gameArea {
   grid-area: main;
   width: 80vh;
   height: 80vh;
   position: relative;
+  overflow: hidden; /* Stops player from moving outside the visible maze area */
 }
 
-/* Grid layout for the maze */
+/* Grid layout for the maze blocks */
 main {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -74,7 +75,7 @@ main {
   height: 100%;
 }
 
-/* Ensures each grid block can center its content */
+/* Ensures each maze block centers its contents */
 .block {
   display: flex;
   justify-content: center;
@@ -135,7 +136,7 @@ div p {
   font-size: 2em;
 }
 
-/* Player is sized and positioned for pixel-based movement */
+/* Player appearance and movement boundaries */
 #player {
   background-color: yellow;
   border-radius: 100%;
@@ -145,7 +146,7 @@ div p {
   z-index: 10;
 }
 
-/* Controls mouth direction and animation */
+/* The black animated part that creates the mouth effect */
 .mouth {
   position: absolute;
   top: 0;
@@ -154,6 +155,7 @@ div p {
   height: 100%;
 }
 
+/* Enemy appearance */
 .enemy {
   background-color: green;
   border-radius: 100%;
@@ -162,6 +164,7 @@ div p {
   position: relative;
 }
 
+/* Point (collectable) appearance */
 .point {
   background-color: white;
   border-radius: 100%;
@@ -169,13 +172,14 @@ div p {
   height: 8px;
 }
 
+/* Maze walls */
 .wall {
   background-color: blue;
   width: 100%;
   height: 100%;
 }
 
-/* Animation for mouth movement */
+/* Styles for each mouth direction and the animation */
 .up, .down, .left, .right {
   background-color: black;
   animation: mouth 1.25s infinite steps(1, end);
@@ -191,7 +195,7 @@ div p {
   50% { opacity: 0; }
 }
 
-/* On-screen controller buttons */
+/* Layout for the on-screen directional controls */
 .controls {
   grid-area: controls;
   display: grid;
@@ -218,13 +222,14 @@ button:nth-child(2) { grid-area: upArrow; }
 button:nth-child(3) { grid-area: rightArrow; }
 button:nth-child(4) { grid-area: downArrow; }
 
-/* Hit and death animations */
+/* Visual feedback for when the player dies */
 @keyframes deathAnimation {
   0% { transform: scale(1); }
   50% { transform: scale(0.5); }
   100% { transform: scale(0); }
 }
 
+/* Animation when the player gets hit */
 @keyframes hitAnimation {
   0%, 100% { background-color: yellow; transform: scale(1); }
   50% { background-color: red; transform: scale(0.75); }
@@ -238,7 +243,7 @@ button:nth-child(4) { grid-area: downArrow; }
   animation: hitAnimation 1s ease-in-out;
 }
 
-/* Player input styling */
+/* Input style for name field on start screen */
 #playerNameInput {
   background-color: black;
   color: white;
