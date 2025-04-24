@@ -77,7 +77,7 @@ for (let row = 0; row < maze.length; row++) {
 const player = document.getElementById('player');
 const playerMouth = player.querySelector('.mouth');
 
-// Listen to arrow keys for movement
+// Movement listeners for arrow keys
 document.addEventListener('keydown', (e) => {
   if (!gameStarted) return;
 
@@ -94,7 +94,7 @@ document.addEventListener('keyup', (e) => {
   if (e.key === 'ArrowRight') rightPressed = false;
 });
 
-// Main game loop
+// Handles player movement with a smooth step delay for sliding
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
@@ -124,7 +124,7 @@ setInterval(() => {
 
   const playerBox = player.getBoundingClientRect();
 
-  // Check for point collision
+  // Check if the player overlaps any point
   document.querySelectorAll('.point').forEach(point => {
     const pointBox = point.getBoundingClientRect();
     const isColliding = (
@@ -141,14 +141,14 @@ setInterval(() => {
     }
   });
 
-  // If all points are eaten
+  // When all points are collected
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
     location.reload();
   }
 
-  // Check if the player touches an enemy
+  // Checks if an enemy touches the player
   document.querySelectorAll('.enemy').forEach(enemy => {
     const enemyBox = enemy.getBoundingClientRect();
     const isTouchingEnemy = (
@@ -162,9 +162,9 @@ setInterval(() => {
       handleEnemyCollision();
     }
   });
-}, 150);
+}, 175); // Delay makes movement feel more classic Pac-Man
 
-// Makes enemies move toward the player every second
+// Moves each enemy toward the player every half second
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -191,9 +191,9 @@ setInterval(() => {
       enemy.style.gridColumnStart = newX + 1;
     }
   });
-}, 500);
+}, 500); // Enemy moves every 0.5s
 
-// Called when an enemy hits the player
+// Handles what happens when the player hits an enemy
 function handleEnemyCollision() {
   lives--;
   canMove = false;
@@ -213,7 +213,7 @@ function handleEnemyCollision() {
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
-  }, 750);
+  }, 1000);
 }
 
 // Save leaderboard to localStorage
@@ -225,7 +225,7 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
-// Loads scores on game start
+// Loads scores from localStorage and updates UI
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
@@ -239,3 +239,4 @@ function loadLeaderboard() {
 }
 
 loadLeaderboard();
+
