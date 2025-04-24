@@ -30,9 +30,6 @@ let score = 0;
 let lives = 3;
 let canMove = true;
 
-const player = document.querySelector('#player');
-const playerMouth = document.querySelector('.mouth');
-
 // Populates the maze grid with elements based on maze array values
 for (let row = 0; row < maze.length; row++) {
   for (let col = 0; col < maze[row].length; col++) {
@@ -56,8 +53,6 @@ for (let row = 0; row < maze.length; row++) {
         break;
       case 3:
         block.classList.add('enemy');
-        block.style.gridRowStart = row + 1;
-        block.style.gridColumnStart = col + 1;
         break;
       default:
         block.classList.add('point');
@@ -73,7 +68,6 @@ const startBtn = document.querySelector('#startBtn');
 const startScreen = document.querySelector('#startScreen');
 const nameInput = document.querySelector('#playerNameInput');
 
-// Starts the game once a valid name is entered
 startBtn.addEventListener('click', () => {
   if (nameInput.value.trim() === "") {
     alert("Please enter your name!");
@@ -106,6 +100,7 @@ function keyDown(event) {
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
+  const player = document.getElementById('player');
   const position = player.getBoundingClientRect();
 
   // Point collection logic
@@ -131,16 +126,12 @@ setInterval(() => {
     location.reload();
   }
 
-  // Enemy collision logic
+  // Enemy collision logic (grid-based, more reliable)
   document.querySelectorAll('.enemy').forEach(enemy => {
-    const enemyPos = enemy.getBoundingClientRect();
-    const isTouchingEnemy =
-      position.right > enemyPos.left &&
-      position.left < enemyPos.right &&
-      position.bottom > enemyPos.top &&
-      position.top < enemyPos.bottom;
+    const enemyY = parseInt(enemy.style.gridRowStart) - 1;
+    const enemyX = parseInt(enemy.style.gridColumnStart) - 1;
 
-    if (isTouchingEnemy) {
+    if (enemyY === playerTop && enemyX === playerLeft) {
       handleEnemyCollision();
     }
   });
@@ -181,12 +172,10 @@ setInterval(() => {
   });
 }, 1500);
 
-// Finds the current player position based on grid tracking
 function getPlayerGridPos() {
   return { y: playerTop, x: playerLeft };
 }
 
-// Reads an enemy's position from its grid style
 function getGridPos(enemy) {
   return {
     y: parseInt(enemy.style.gridRowStart) - 1,
@@ -194,7 +183,6 @@ function getGridPos(enemy) {
   };
 }
 
-// Determines the next step direction for an enemy to chase the player
 function getNextStepTowardPlayer(from, to) {
   const dy = to.y - from.y;
   const dx = to.x - from.x;
@@ -208,14 +196,13 @@ function getNextStepTowardPlayer(from, to) {
   }
 }
 
-// Activates when arrow keys are pressed or released
 document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
 
-// What happens when the player hits an enemy
 function handleEnemyCollision() {
   lives--;
   canMove = false;
+  const player = document.getElementById('player');
   player.classList.add('hit');
 
   const lifeIcons = document.querySelectorAll('.lives li');
@@ -235,7 +222,6 @@ function handleEnemyCollision() {
   }, 1500);
 }
 
-// Saves the score to localStorage for leaderboard tracking
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   scores.push({ name: playerName, score: score });
@@ -244,7 +230,6 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
-// Loads and displays the leaderboard from localStorage
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
