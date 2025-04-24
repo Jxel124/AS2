@@ -21,6 +21,11 @@ const startScreen = document.querySelector('#startScreen');
 const nameInput = document.querySelector('#playerNameInput');
 const scoreDisplay = document.querySelector('.score p');
 
+// Keeps track of the last direction we successfully moved in
+let currentDirection = null;
+// Stores the most recent input to try when possible
+let nextDirection = null;
+
 // Handles the start of the game when the player enters their name
 startBtn.addEventListener('click', () => {
   if (nameInput.value.trim() === "") {
@@ -80,46 +85,46 @@ const playerMouth = player.querySelector('.mouth');
 // Handles key presses
 document.addEventListener('keydown', (e) => {
   if (!gameStarted) return;
-  if (e.key === 'ArrowUp') upPressed = true;
-  if (e.key === 'ArrowDown') downPressed = true;
-  if (e.key === 'ArrowLeft') leftPressed = true;
-  if (e.key === 'ArrowRight') rightPressed = true;
-});
 
-document.addEventListener('keyup', (e) => {
-  if (e.key === 'ArrowUp') upPressed = false;
-  if (e.key === 'ArrowDown') downPressed = false;
-  if (e.key === 'ArrowLeft') leftPressed = false;
-  if (e.key === 'ArrowRight') rightPressed = false;
+  // Store the most recent direction so we can buffer it
+  if (e.key === 'ArrowUp') nextDirection = 'up';
+  if (e.key === 'ArrowDown') nextDirection = 'down';
+  if (e.key === 'ArrowLeft') nextDirection = 'left';
+  if (e.key === 'ArrowRight') nextDirection = 'right';
 });
 
 // Game loop: manages movement, collision, scoring
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
-  let nextRow = playerTop;
-  let nextCol = playerLeft;
+  // Convert direction string into coordinates
+  const directionToCoords = {
+    'up':    { row: -1, col: 0, class: 'mouth up' },
+    'down':  { row: 1, col: 0, class: 'mouth down' },
+    'left':  { row: 0, col: -1, class: 'mouth left' },
+    'right': { row: 0, col: 1, class: 'mouth right' }
+  };
 
-  if (downPressed) {
-    nextRow++;
-    playerMouth.className = 'mouth down';
-  } else if (upPressed) {
-    nextRow--;
-    playerMouth.className = 'mouth up';
-  } else if (leftPressed) {
-    nextCol--;
-    playerMouth.className = 'mouth left';
-  } else if (rightPressed) {
-    nextCol++;
-    playerMouth.className = 'mouth right';
+  if (nextDirection) {
+    const checkNext = directionToCoords[nextDirection];
+    const nextRow = playerTop + checkNext.row;
+    const nextCol = playerLeft + checkNext.col;
+    if (maze[nextRow][nextCol] !== 1) {
+      currentDirection = nextDirection;
+    }
   }
 
-  // Check wall collision
-  if (maze[nextRow][nextCol] !== 1) {
-    playerTop = nextRow;
-    playerLeft = nextCol;
-    player.style.gridRowStart = playerTop + 1;
-    player.style.gridColumnStart = playerLeft + 1;
+  if (currentDirection) {
+    const move = directionToCoords[currentDirection];
+    const newRow = playerTop + move.row;
+    const newCol = playerLeft + move.col;
+    if (maze[newRow][newCol] !== 1) {
+      playerTop = newRow;
+      playerLeft = newCol;
+      player.style.gridRowStart = playerTop + 1;
+      player.style.gridColumnStart = playerLeft + 1;
+      playerMouth.className = move.class;
+    }
   }
 
   const playerBox = player.getBoundingClientRect();
@@ -162,7 +167,7 @@ setInterval(() => {
     }
   });
 
-}, 175); // Smooth step-like motion
+}, 120); // Slightly faster interval for smoother feel
 
 // Enemies chase player by calculating direction every 0.5s
 setInterval(() => {
@@ -213,7 +218,7 @@ function handleEnemyCollision() {
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
-  }, 1000); // Animation time
+  }, 1000);
 }
 
 // Save leaderboard to localStorage
