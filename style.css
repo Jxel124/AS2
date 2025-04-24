@@ -167,15 +167,15 @@ main {
   border-radius: 50%;
 }
 
-/* Player style */
+/* Player style - adjusted to match the size of the enemies */
 #player {
   background-color: yellow;
   border-radius: 100%;
-  width: 40px;
-  height: 40px;
+  width: 90%; /* Player size updated to match enemy size */
+  height: 90%; /* Player size updated to match enemy size */
   position: absolute;
   z-index: 10;
-  transition: top 0.1s, left 0.1s;
+  transition: top 0.15s ease, left 0.15s ease; /* Smooth movement */
 }
 
 /* Mouth overlay to show direction */
