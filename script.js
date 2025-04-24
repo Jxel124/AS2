@@ -24,10 +24,8 @@ let maze = [
 ];
 
 let playerName = "";
-
 let playerTop = 1;
 let playerLeft = 1;
-
 let score = 0;
 let lives = 3;
 let canMove = true;
@@ -35,7 +33,7 @@ let canMove = true;
 const player = document.querySelector('#player');
 const playerMouth = document.querySelector('.mouth');
 
-// Populates the maze in the HTML
+// Populates the maze grid with elements based on maze array values
 for (let row = 0; row < maze.length; row++) {
   for (let col = 0; col < maze[row].length; col++) {
     let cell = maze[row][col];
@@ -75,6 +73,7 @@ const startBtn = document.querySelector('#startBtn');
 const startScreen = document.querySelector('#startScreen');
 const nameInput = document.querySelector('#playerNameInput');
 
+// Starts the game once a valid name is entered
 startBtn.addEventListener('click', () => {
   if (nameInput.value.trim() === "") {
     alert("Please enter your name!");
@@ -85,6 +84,7 @@ startBtn.addEventListener('click', () => {
   startScreen.style.display = 'none';
 });
 
+// Releases direction keys
 function keyUp(event) {
   if (event.key === 'ArrowUp') upPressed = false;
   else if (event.key === 'ArrowDown') downPressed = false;
@@ -92,6 +92,7 @@ function keyUp(event) {
   else if (event.key === 'ArrowRight') rightPressed = false;
 }
 
+// Detects when a direction key is pressed
 function keyDown(event) {
   if (!gameStarted) return;
 
@@ -101,11 +102,13 @@ function keyDown(event) {
   else if (event.key === 'ArrowRight') rightPressed = true;
 }
 
+// Handles player movement and interaction checks
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
-  let position = player.getBoundingClientRect();
+  const position = player.getBoundingClientRect();
 
+  // Point collection logic
   document.querySelectorAll('.point').forEach(point => {
     const pointPos = point.getBoundingClientRect();
     const isColliding =
@@ -121,12 +124,14 @@ setInterval(() => {
     }
   });
 
+  // Win condition when all points are collected
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
     location.reload();
   }
 
+  // Enemy collision logic
   document.querySelectorAll('.enemy').forEach(enemy => {
     const enemyPos = enemy.getBoundingClientRect();
     const isTouchingEnemy =
@@ -140,15 +145,24 @@ setInterval(() => {
     }
   });
 
-  if (downPressed) playerTop++;
-  else if (upPressed) playerTop--;
-  else if (leftPressed) playerLeft--;
-  else if (rightPressed) playerLeft++;
+  // Handles direction movement and prevents wall clipping
+  let nextRow = playerTop;
+  let nextCol = playerLeft;
 
-  player.style.gridRowStart = playerTop + 1;
-  player.style.gridColumnStart = playerLeft + 1;
-}, 10);
+  if (downPressed) nextRow++;
+  else if (upPressed) nextRow--;
+  else if (leftPressed) nextCol--;
+  else if (rightPressed) nextCol++;
 
+  if (maze[nextRow][nextCol] !== 1) {
+    playerTop = nextRow;
+    playerLeft = nextCol;
+    player.style.gridRowStart = playerTop + 1;
+    player.style.gridColumnStart = playerLeft + 1;
+  }
+}, 100);
+
+// Moves the enemies toward the player every 1.5 seconds
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -167,14 +181,12 @@ setInterval(() => {
   });
 }, 1500);
 
+// Finds the current player position based on grid tracking
 function getPlayerGridPos() {
-  for (let y = 0; y < maze.length; y++) {
-    for (let x = 0; x < maze[y].length; x++) {
-      if (maze[y][x] === 2) return { y, x };
-    }
-  }
+  return { y: playerTop, x: playerLeft };
 }
 
+// Reads an enemy's position from its grid style
 function getGridPos(enemy) {
   return {
     y: parseInt(enemy.style.gridRowStart) - 1,
@@ -182,6 +194,7 @@ function getGridPos(enemy) {
   };
 }
 
+// Determines the next step direction for an enemy to chase the player
 function getNextStepTowardPlayer(from, to) {
   const dy = to.y - from.y;
   const dx = to.x - from.x;
@@ -195,9 +208,11 @@ function getNextStepTowardPlayer(from, to) {
   }
 }
 
+// Activates when arrow keys are pressed or released
 document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
 
+// What happens when the player hits an enemy
 function handleEnemyCollision() {
   lives--;
   canMove = false;
@@ -220,6 +235,7 @@ function handleEnemyCollision() {
   }, 1500);
 }
 
+// Saves the score to localStorage for leaderboard tracking
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   scores.push({ name: playerName, score: score });
@@ -228,6 +244,7 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
+// Loads and displays the leaderboard from localStorage
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
