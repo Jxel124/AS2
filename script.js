@@ -86,14 +86,13 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { rightPressed = true; upPressed = downPressed = leftPressed = false; }
 });
 
-// Game loop: manages movement, collision, scoring
+// Gliding-style movement happens repeatedly as long as a key is held
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
   let nextRow = playerTop;
   let nextCol = playerLeft;
 
-  // Movement: making sure movement is smooth and sliding
   if (downPressed) {
     nextRow++;
     playerMouth.className = 'mouth down';
@@ -108,7 +107,6 @@ setInterval(() => {
     playerMouth.className = 'mouth right';
   }
 
-  // Check for wall collision
   if (maze[nextRow][nextCol] !== 1) {
     playerTop = nextRow;
     playerLeft = nextCol;
@@ -118,7 +116,7 @@ setInterval(() => {
 
   const playerBox = player.getBoundingClientRect();
 
-  // Point collection logic
+  // Check for collision with point
   document.querySelectorAll('.point').forEach(point => {
     const pointBox = point.getBoundingClientRect();
     const isColliding = (
@@ -134,7 +132,7 @@ setInterval(() => {
     }
   });
 
-  // Check win condition (when all points are collected)
+  // End game if all points collected
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
@@ -154,36 +152,36 @@ setInterval(() => {
       handleEnemyCollision();
     }
   });
-}, 180); // Slightly slower movement speed
+}, 150); // Runs faster for smoother movement
 
-// AI movement: enemies chase the player every 0.5s
+// AI movement — each enemy chooses a random direction that avoids walls
 setInterval(() => {
   if (!gameStarted) return;
 
-  const playerPos = { y: playerTop, x: playerLeft };
+  const directions = [
+    { row: -1, col: 0 }, // up
+    { row: 1, col: 0 },  // down
+    { row: 0, col: -1 }, // left
+    { row: 0, col: 1 }   // right
+  ];
 
   document.querySelectorAll('.enemy').forEach(enemy => {
-    const enemyPos = {
-      y: parseInt(enemy.style.gridRowStart) - 1,
-      x: parseInt(enemy.style.gridColumnStart) - 1
-    };
+    const currentRow = parseInt(enemy.style.gridRowStart) - 1;
+    const currentCol = parseInt(enemy.style.gridColumnStart) - 1;
 
-    const dy = playerPos.y - enemyPos.y;
-    const dx = playerPos.x - enemyPos.x;
+    const options = directions.filter(d => {
+      const r = currentRow + d.row;
+      const c = currentCol + d.col;
+      return maze[r][c] !== 1;
+    });
 
-    const direction = Math.abs(dy) > Math.abs(dx)
-      ? { y: dy > 0 ? 1 : -1, x: 0 }
-      : { y: 0, x: dx > 0 ? 1 : -1 };
-
-    const newY = enemyPos.y + direction.y;
-    const newX = enemyPos.x + direction.x;
-
-    if (maze[newY][newX] !== 1) {
-      enemy.style.gridRowStart = newY + 1;
-      enemy.style.gridColumnStart = newX + 1;
+    if (options.length > 0) {
+      const move = options[Math.floor(Math.random() * options.length)];
+      enemy.style.gridRowStart = currentRow + move.row + 1;
+      enemy.style.gridColumnStart = currentCol + move.col + 1;
     }
   });
-}, 500); // AI moves every 0.5s
+}, 500); // Enemies move every half second
 
 // Runs when the player touches an enemy
 function handleEnemyCollision() {
@@ -205,7 +203,7 @@ function handleEnemyCollision() {
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
-  }, 1000); // Animation time for hit effect
+  }, 1000); // Pause briefly after hit
 }
 
 // Save leaderboard to localStorage
