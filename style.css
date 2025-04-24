@@ -194,6 +194,7 @@ main {
   height: 90%;
   width: 90%;
   position: relative;
+  z-index: 5;
 }
 
 /* Point styling */
@@ -202,6 +203,8 @@ main {
   border-radius: 100%;
   width: 8px;
   height: 8px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Wall block styling */
@@ -209,6 +212,7 @@ main {
   background-color: blue;
   width: 100%;
   height: 100%;
+  z-index: 0;
 }
 
 /* Mouth direction animations */
@@ -291,4 +295,3 @@ button:nth-child(4) { grid-area: downArrow; }
   margin-left: 10px;
   width: 200px;
 }
-
