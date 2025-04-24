@@ -33,6 +33,7 @@ startBtn.addEventListener('click', () => {
   playerName = nameInput.value.trim();
   gameStarted = true;
   startScreen.style.display = 'none';
+  movePlayerToGrid(); // places player at initial position
 });
 
 // Maze layout: Player = 2, Wall = 1, Enemy = 3, Point = 0
@@ -49,7 +50,7 @@ let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
-// Populates the maze in the HTML
+// Builds the maze and player position from the array
 for (let row = 0; row < maze.length; row++) {
   for (let col = 0; col < maze[row].length; col++) {
     const cell = maze[row][col];
@@ -80,68 +81,46 @@ for (let row = 0; row < maze.length; row++) {
 const player = document.getElementById('player');
 const playerMouth = player.querySelector('.mouth');
 
-// Sets the pixel position based on grid cell
-player.style.position = 'absolute';
-player.style.left = player.offsetLeft + 'px';
-player.style.top = player.offsetTop + 'px';
+// Places player visually based on row and column in grid
+function movePlayerToGrid() {
+  const tileSize = main.offsetWidth / 10;
+  player.style.left = playerLeft * tileSize + 'px';
+  player.style.top = playerTop * tileSize + 'px';
+}
 
-// Handles key presses
+// Handles key presses for tile-based movement
 document.addEventListener('keydown', (e) => {
-  if (!gameStarted) return;
-  if (e.key === 'ArrowUp')    { upPressed = true; downPressed = leftPressed = rightPressed = false; }
-  if (e.key === 'ArrowDown')  { downPressed = true; upPressed = leftPressed = rightPressed = false; }
-  if (e.key === 'ArrowLeft')  { leftPressed = true; upPressed = downPressed = rightPressed = false; }
-  if (e.key === 'ArrowRight') { rightPressed = true; upPressed = downPressed = leftPressed = false; }
-});
+  if (!gameStarted || !canMove) return;
 
-// Moves the player every frame if key is held
-function glideMove() {
-  if (!gameStarted || !canMove) {
-    requestAnimationFrame(glideMove);
+  let nextRow = playerTop;
+  let nextCol = playerLeft;
+
+  if (e.key === 'ArrowUp') {
+    nextRow--;
+    playerMouth.className = 'mouth up';
+  } else if (e.key === 'ArrowDown') {
+    nextRow++;
+    playerMouth.className = 'mouth down';
+  } else if (e.key === 'ArrowLeft') {
+    nextCol--;
+    playerMouth.className = 'mouth left';
+  } else if (e.key === 'ArrowRight') {
+    nextCol++;
+    playerMouth.className = 'mouth right';
+  } else {
     return;
   }
 
-  let speed = 2.5;
-  let moveX = 0;
-  let moveY = 0;
+  const nextTile = maze[nextRow]?.[nextCol];
 
-  if (upPressed) moveY = -speed;
-  if (downPressed) moveY = speed;
-  if (leftPressed) moveX = -speed;
-  if (rightPressed) moveX = speed;
-
-  const newLeft = player.offsetLeft + moveX;
-  const newTop = player.offsetTop + moveY;
-
-  // Calculates the grid cell the player would move into
-  const cellWidth = main.offsetWidth / 10;
-  const cellHeight = main.offsetHeight / 10;
-  const colIndex = Math.floor((newLeft + player.offsetWidth / 2) / cellWidth);
-  const rowIndex = Math.floor((newTop + player.offsetHeight / 2) / cellHeight);
-
-  // Prevents movement if the next position is outside the maze or a wall
-  if (
-    rowIndex >= 0 &&
-    rowIndex < maze.length &&
-    colIndex >= 0 &&
-    colIndex < maze[0].length &&
-    maze[rowIndex][colIndex] !== 1
-  ) {
-    player.style.left = newLeft + 'px';
-    player.style.top = newTop + 'px';
-
-    if (moveX > 0) playerMouth.className = 'mouth right';
-    else if (moveX < 0) playerMouth.className = 'mouth left';
-    else if (moveY < 0) playerMouth.className = 'mouth up';
-    else if (moveY > 0) playerMouth.className = 'mouth down';
+  if (nextTile !== undefined && nextTile !== 1) {
+    playerTop = nextRow;
+    playerLeft = nextCol;
+    movePlayerToGrid();
+    checkPointCollision();
+    checkEnemyCollision();
   }
-
-  checkPointCollision();
-  checkEnemyCollision();
-  requestAnimationFrame(glideMove);
-}
-
-requestAnimationFrame(glideMove); // Starts the game loop
+});
 
 // Checks if the player overlaps a point
 function checkPointCollision() {
@@ -261,4 +240,3 @@ function loadLeaderboard() {
 }
 
 loadLeaderboard();
-
