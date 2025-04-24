@@ -80,7 +80,7 @@ for (let row = 0; row < maze.length; row++) {
 const player = document.getElementById('player');
 const playerMouth = player.querySelector('.mouth');
 
-// Set player position in pixels inside the game area
+// Sets the pixel position based on grid cell
 player.style.position = 'absolute';
 player.style.left = player.offsetLeft + 'px';
 player.style.top = player.offsetTop + 'px';
@@ -94,7 +94,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { rightPressed = true; upPressed = downPressed = leftPressed = false; }
 });
 
-// Moves the player every animation frame based on current direction
+// Moves the player every frame if key is held
 function glideMove() {
   if (!gameStarted || !canMove) {
     requestAnimationFrame(glideMove);
@@ -110,9 +110,7 @@ function glideMove() {
   if (leftPressed)  moveX = -speed;
   if (rightPressed) moveX = speed;
 
-  const gameArea = main.getBoundingClientRect();
-  const playerBox = player.getBoundingClientRect();
-
+  const gameArea = document.querySelector('.gameArea').getBoundingClientRect();
   const newLeft = player.offsetLeft + moveX;
   const newTop = player.offsetTop + moveY;
   const newRight = newLeft + player.offsetWidth;
@@ -127,7 +125,6 @@ function glideMove() {
   if (insideBounds) {
     const checkX = newLeft + player.offsetWidth / 2;
     const checkY = newTop + player.offsetHeight / 2;
-
     const el = document.elementFromPoint(checkX, checkY);
     const isBlocked = el && el.classList.contains('wall');
 
@@ -147,9 +144,9 @@ function glideMove() {
   requestAnimationFrame(glideMove);
 }
 
-requestAnimationFrame(glideMove); // Starts the movement loop
+requestAnimationFrame(glideMove); // Starts the game loop
 
-// Checks if player touches a point and increases score
+// Checks if the player overlaps a point
 function checkPointCollision() {
   const playerBox = player.getBoundingClientRect();
 
@@ -175,7 +172,7 @@ function checkPointCollision() {
   }
 }
 
-// Checks if the player touches an enemy and handles collision
+// Checks if the player collides with an enemy
 function checkEnemyCollision() {
   const playerBox = player.getBoundingClientRect();
   document.querySelectorAll('.enemy').forEach(enemy => {
@@ -215,7 +212,7 @@ function handleEnemyCollision() {
   }, 1000);
 }
 
-// Moves enemies in a random direction every 0.5 seconds
+// Moves enemies in a random valid direction every 0.5 seconds
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -244,7 +241,7 @@ setInterval(() => {
   });
 }, 500);
 
-// Saves score and name to local storage leaderboard
+// Saves score and player name to local storage
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   scores.push({ name: playerName, score });
@@ -253,7 +250,7 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
-// Loads and displays saved leaderboard scores
+// Loads the top scores on page load
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
