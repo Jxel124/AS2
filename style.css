@@ -1,173 +1,172 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 * {
-    margin: 0;
-    padding: 0;
-    color: white;
-    font-family: 'Press Start 2P';
+  margin: 0;
+  padding: 0;
+  color: white;
+  font-family: 'Press Start 2P';
 }
 
 body {
-    background-color: black;
-    height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 80vh 1fr;
-    grid-template-rows: auto;
-    grid-template-areas: 
-        "header header header"
-        "lboard main score"
-        "lboard main controls";
-    align-items: center;
-    justify-items: center;
+  background-color: black;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 80vh 1fr;
+  grid-template-rows: auto;
+  grid-template-areas: 
+    "header header header"
+    "lboard main score"
+    "lboard main controls";
+  align-items: center;
+  justify-items: center;
 }
 
 header {
-    grid-area: header;
-    text-align: center;
+  grid-area: header;
+  text-align: center;
 }
 
 .startDiv {
-    position: absolute;
-    display: flex;
-    height: 100vh;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
+  position: absolute;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  align-items: center;
+  justify-content: center;
 }
 
 .startDiv div {
-    background-color: #ccc;
-    z-index: 100;
-    cursor: pointer;
-    border-radius: 20px;
-    box-shadow: 4px 4px 4px #000;
-    padding: 20px 30px;
-    display: flex;
-    height: 64px;
-    align-items: center;
+  background-color: #ccc;
+  z-index: 100;
+  border-radius: 20px;
+  box-shadow: 4px 4px 4px #000;
+  padding: 20px 30px;
+  display: flex;
+  height: 64px;
+  align-items: center;
 }
 
 .startDiv h1 {
-    text-shadow: 2px 2px 2px #000;
-    font-size: 2em;
-    margin-left: 10px;
+  text-shadow: 2px 2px 2px #000;
+  font-size: 2em;
+  margin-left: 10px;
 }
 
 header h1 {
-    font-size: 4em;
+  font-size: 4em;
 }
 
 main {
-    grid-area: main;
-    display: grid;
-    grid-template-columns: repeat(10, 10%);
-    width: 80vh;
-    height: 80vh;
-    align-items: center;
-    justify-items: center;
+  grid-area: main;
+  display: grid;
+  grid-template-columns: repeat(10, 10%);
+  width: 80vh;
+  height: 80vh;
+  align-items: center;
+  justify-items: center;
 }
 
 /* Ensures each grid block can center its content */
 .block {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Lives styling */
 .lives {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    margin: 0.5em;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  margin: 0.5em;
 }
 
 .lives li {
-    list-style: none;
-    background-color: yellow;
-    width: 2em;
-    height: 2em;
-    border-radius: 100%;
-    margin: 5px;
+  list-style: none;
+  background-color: yellow;
+  width: 2em;
+  height: 2em;
+  border-radius: 100%;
+  margin: 5px;
 }
 
 .lives ul {
-    display: flex;
+  display: flex;
 }
 
 .score {
-    grid-area: score;
+  grid-area: score;
 }
 
 .leaderboard {
-    grid-area: lboard;
+  grid-area: lboard;
 }
 
 .leaderboard ol {
-    margin-left: 2.5em;
-    margin-top: 1em;
-    text-align: left;
+  margin-left: 2.5em;
+  margin-top: 1em;
+  text-align: left;
 }
 
 .leaderboard ol li {
-    font-size: 0.85em;
-    padding: 1em 0;
+  font-size: 0.85em;
+  padding: 1em 0;
 }
 
 div {
-    text-align: center;
+  text-align: center;
 }
 
 div h1 {
-    font-size: 1.25em;
-    text-decoration: underline;
+  font-size: 1.25em;
+  text-decoration: underline;
 }
 
 div p {
-    margin: 0.5em;
-    font-size: 2em;
+  margin: 0.5em;
+  font-size: 2em;
 }
 
 #player {
-    background-color: yellow;
-    border-radius: 100%;
-    position: relative;
-    width: 85%;
-    height: 85%;
+  background-color: yellow;
+  border-radius: 100%;
+  position: relative;
+  width: 85%;
+  height: 85%;
 }
 
 .enemy {
-    background-color: green;
-    border-radius: 100%;
-    height: 90%;
-    width: 90%;
-    position: relative;
+  background-color: green;
+  border-radius: 100%;
+  height: 90%;
+  width: 90%;
+  position: relative;
 }
 
 .point {
-    background-color: white;
-    border-radius: 100%;
-    width: 8px;
-    height: 8px;
+  background-color: white;
+  border-radius: 100%;
+  width: 8px;
+  height: 8px;
 }
 
 .wall {
-    background-color: blue;
-    width: 100%;
-    height: 100%;
+  background-color: blue;
+  width: 100%;
+  height: 100%;
 }
 
-/* Animation for the Pac-Man mouth */
+/* Animation for mouth movement */
 .up, .down, .left, .right {
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    animation: mouth 1.25s infinite steps(1, end);
-    position: absolute;
-    top: 0;
-    left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  animation: mouth 1.25s infinite steps(1, end);
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .up { clip-path: polygon(0 0, 100% 0, 50% 50%); }
@@ -176,30 +175,30 @@ div p {
 .right { clip-path: polygon(100% 0, 100% 100%, 50% 50%); }
 
 @keyframes mouth {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
-/* Controller buttons */
+/* On-screen controller buttons */
 .controls {
-    grid-area: controls;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    grid-template-areas: 
-        ". upArrow ."
-        "leftArrow . rightArrow"
-        ". downArrow .";
-    width: 25vh;
-    height: 25vh;
+  grid-area: controls;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-areas: 
+    ". upArrow ."
+    "leftArrow . rightArrow"
+    ". downArrow .";
+  width: 25vh;
+  height: 25vh;
 }
 
 button {
-    background-color: rgb(10, 10, 10);
-    color: white;
-    font-family: 'Press Start 2P';
-    font-size: 1em;
-    border: none;
+  background-color: rgb(10, 10, 10);
+  color: white;
+  font-family: 'Press Start 2P';
+  font-size: 1em;
+  border: none;
 }
 
 button:nth-child(1) { grid-area: leftArrow; }
@@ -207,34 +206,34 @@ button:nth-child(2) { grid-area: upArrow; }
 button:nth-child(3) { grid-area: rightArrow; }
 button:nth-child(4) { grid-area: downArrow; }
 
-/* Animation for hit/death */
+/* Hit and death animations */
 @keyframes deathAnimation {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.5); }
-    100% { transform: scale(0); }
+  0% { transform: scale(1); }
+  50% { transform: scale(0.5); }
+  100% { transform: scale(0); }
 }
 
 @keyframes hitAnimation {
-    0%, 100% { background-color: yellow; transform: scale(1); }
-    50% { background-color: red; transform: scale(0.75); }
+  0%, 100% { background-color: yellow; transform: scale(1); }
+  50% { background-color: red; transform: scale(0.75); }
 }
 
 .dead {
-    animation: deathAnimation 1.5s ease-in-out forwards;
+  animation: deathAnimation 1.5s ease-in-out forwards;
 }
 
 .hit {
-    animation: hitAnimation 1s ease-in-out;
+  animation: hitAnimation 1s ease-in-out;
 }
 
-/* Style for the name input */
+/* Player input styling */
 #playerNameInput {
-    background-color: black;
-    color: white;
-    border: 2px solid white;
-    padding: 10px 15px;
-    font-size: 0.75em;
-    font-family: 'Press Start 2P';
-    margin-left: 10px;
-    width: 200px;
+  background-color: black;
+  color: white;
+  border: 2px solid white;
+  padding: 10px 15px;
+  font-size: 0.75em;
+  font-family: 'Press Start 2P';
+  margin-left: 10px;
+  width: 200px;
 }
