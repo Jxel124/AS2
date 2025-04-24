@@ -51,7 +51,6 @@ header {
 .startDiv h1 {
     text-shadow: 2px 2px 2px #000;
     font-size: 2em;
-    text-decoration: none;
     margin-left: 10px;
 }
 
@@ -67,7 +66,6 @@ main {
     height: 80vh;
     align-items: center;
     justify-items: center;
-    position: relative;
 }
 
 /* Ensures each grid block can center its content */
@@ -77,14 +75,11 @@ main {
     align-items: center;
 }
 
-/* Lives styling */
 .lives {
     position: absolute;
     top: 0;
     right: 0;
-    height: auto;
     display: flex;
-    align-items: center;
     margin: 0.5em;
 }
 
@@ -121,7 +116,6 @@ main {
 }
 
 div {
-    height: 100%;
     text-align: center;
 }
 
@@ -141,7 +135,6 @@ div p {
     position: relative;
     width: 85%;
     height: 85%;
-    transition: transform 0.1s ease-in-out;
 }
 
 .enemy {
@@ -150,13 +143,11 @@ div p {
     height: 90%;
     width: 90%;
     position: relative;
-    transition: all 0.25s linear;
 }
 
-/* Dot that represents a point to collect */
 .point {
-    border-radius: 100%;
     background-color: white;
+    border-radius: 100%;
     width: 8px;
     height: 8px;
 }
@@ -167,7 +158,7 @@ div p {
     height: 100%;
 }
 
-/* Styles for the player direction */
+/* Animation classes to show mouth direction and chomp effect */
 .up, .down, .left, .right {
     width: 100%;
     height: 100%;
@@ -188,7 +179,6 @@ div p {
     50% { opacity: 0; }
 }
 
-/* Directional button styling */
 .controls {
     grid-area: controls;
     display: grid;
@@ -206,9 +196,8 @@ button {
     background-color: rgb(10, 10, 10);
     color: white;
     font-family: 'Press Start 2P';
-    border: none;
     font-size: 1em;
-    padding: 0.5em;
+    border: none;
 }
 
 button:nth-child(1) { grid-area: leftArrow; }
@@ -217,24 +206,14 @@ button:nth-child(3) { grid-area: rightArrow; }
 button:nth-child(4) { grid-area: downArrow; }
 
 @keyframes deathAnimation {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(0.5); opacity: 0.5; }
-    100% { transform: scale(0); opacity: 0; }
+    0% { transform: scale(1); }
+    50% { transform: scale(0.5); }
+    100% { transform: scale(0); }
 }
 
 @keyframes hitAnimation {
-    0%, 100% {
-        background-color: yellow;
-        transform: scale(1);
-    }
-    25% {
-        background-color: red;
-        transform: scale(1.1);
-    }
-    75% {
-        background-color: yellow;
-        transform: scale(0.9);
-    }
+    0%, 100% { background-color: yellow; transform: scale(1); }
+    50% { background-color: red; transform: scale(0.75); }
 }
 
 .dead {
@@ -242,10 +221,10 @@ button:nth-child(4) { grid-area: downArrow; }
 }
 
 .hit {
-    animation: hitAnimation 0.6s ease-in-out;
+    animation: hitAnimation 1s ease-in-out;
 }
 
-/* Style for the name input on the start screen */
+/* Style for the name input */
 #playerNameInput {
     background-color: black;
     color: white;
