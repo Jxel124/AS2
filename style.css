@@ -57,14 +57,21 @@ header h1 {
   font-size: 4em;
 }
 
-main {
+/* Container for grid and player positioning */
+.gameArea {
   grid-area: main;
-  display: grid;
-  grid-template-columns: repeat(10, 10%);
   width: 80vh;
   height: 80vh;
-  align-items: center;
-  justify-items: center;
+  position: relative;
+}
+
+/* Grid layout for the maze */
+main {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  width: 100%;
+  height: 100%;
 }
 
 /* Ensures each grid block can center its content */
@@ -128,12 +135,23 @@ div p {
   font-size: 2em;
 }
 
+/* Player is sized and positioned for pixel-based movement */
 #player {
   background-color: yellow;
   border-radius: 100%;
-  position: relative;
-  width: 85%;
-  height: 85%;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  z-index: 10;
+}
+
+/* Controls mouth direction and animation */
+.mouth {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .enemy {
@@ -159,13 +177,8 @@ div p {
 
 /* Animation for mouth movement */
 .up, .down, .left, .right {
-  width: 100%;
-  height: 100%;
   background-color: black;
   animation: mouth 1.25s infinite steps(1, end);
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
 .up { clip-path: polygon(0 0, 100% 0, 50% 50%); }
