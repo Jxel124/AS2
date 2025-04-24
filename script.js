@@ -34,7 +34,7 @@ startBtn.addEventListener('click', () => {
   gameStarted = true;
   startScreen.style.display = 'none';
   movePlayerToGrid();
-  requestAnimationFrame(animatePlayer);
+  requestAnimationFrame(animatePlayer); // Starts animation loop for smooth movement
 });
 
 // Maze layout: Player = 2, Wall = 1, Enemy = 3, Point = 0
@@ -96,33 +96,36 @@ function animatePlayer() {
   if (leftPressed)  attemptMove(0, -1, 'left');
   if (rightPressed) attemptMove(0, 1, 'right');
 
-  requestAnimationFrame(animatePlayer);
+  requestAnimationFrame(animatePlayer); // Looping animation function for continuous movement
 }
 
 // Attempts to move in the given direction
 function attemptMove(rowOffset, colOffset, direction) {
-  if (!canMove) return;
+  if (!canMove) return; // Prevent movement during animation or collision
 
   const nextRow = playerTop + rowOffset;
   const nextCol = playerLeft + colOffset;
   const nextTile = maze[nextRow]?.[nextCol];
 
+  // Only move if the next tile is not a wall (1)
   if (nextTile !== undefined && nextTile !== 1) {
     playerTop = nextRow;
     playerLeft = nextCol;
     movePlayerToGrid();
-    playerMouth.className = `mouth ${direction}`;
-    checkPointCollision();
-    checkEnemyCollision();
+    playerMouth.className = `mouth ${direction}`; // Change direction of the mouth
+    checkPointCollision(); // Check if the player collected any points
+    checkEnemyCollision(); // Check if the player collided with an enemy
   }
 
+  // Prevent rapid movement
   canMove = false;
   setTimeout(() => { canMove = true; }, 150);
 }
 
-// Keyboard input
+// Keyboard input to control direction
 document.addEventListener('keydown', e => {
   if (!gameStarted) return;
+
   if (e.key === 'ArrowUp')    { upPressed = true; downPressed = leftPressed = rightPressed = false; }
   if (e.key === 'ArrowDown')  { downPressed = true; upPressed = leftPressed = rightPressed = false; }
   if (e.key === 'ArrowLeft')  { leftPressed = true; upPressed = downPressed = rightPressed = false; }
@@ -136,11 +139,12 @@ function checkPointCollision() {
     const col = parseInt(point.style.gridColumnStart) - 1;
     if (row === playerTop && col === playerLeft) {
       point.remove();
-      score++;
+      score++; // Increase score when a point is eaten
       scoreDisplay.textContent = score;
     }
   });
 
+  // If all points are collected, finish the game
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
@@ -160,20 +164,20 @@ function checkEnemyCollision() {
       playerBox.top < box.bottom
     );
     if (colliding) {
-      handleEnemyCollision();
+      handleEnemyCollision(); // Handle collision with an enemy
     }
   });
 }
 
 // Handles what happens when the player hits an enemy
 function handleEnemyCollision() {
-  lives--;
+  lives--; // Reduce life on collision
   canMove = false;
-  player.classList.add('hit');
+  player.classList.add('hit'); // Play hit animation
 
   const lifeIcons = document.querySelectorAll('.lives li');
   if (lifeIcons[lives]) {
-    lifeIcons[lives].style.backgroundColor = 'transparent';
+    lifeIcons[lives].style.backgroundColor = 'transparent'; // Remove life indicator
   }
 
   setTimeout(() => {
@@ -185,7 +189,7 @@ function handleEnemyCollision() {
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
-  }, 1000);
+  }, 1000); // Allow time for hit animation before allowing movement again
 }
 
 // Moves enemies in a random valid direction every 0.5 seconds
@@ -215,15 +219,15 @@ setInterval(() => {
       enemy.style.gridColumnStart = col + move.col + 1;
     }
   });
-}, 500);
+}, 500); // Move enemies randomly every 500ms
 
 // Saves score and player name to local storage
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   scores.push({ name: playerName, score });
-  scores.sort((a, b) => b.score - a.score);
-  scores = scores.slice(0, 5);
-  localStorage.setItem("leaderboard", JSON.stringify(scores));
+  scores.sort((a, b) => b.score - a.score); // Sort by highest score
+  scores = scores.slice(0, 5); // Keep top 5 scores
+  localStorage.setItem("leaderboard", JSON.stringify(scores)); // Store in localStorage
 }
 
 // Loads the top scores on page load
@@ -239,4 +243,4 @@ function loadLeaderboard() {
   });
 }
 
-loadLeaderboard();
+loadLeaderboard(); // Load leaderboard when the game starts
