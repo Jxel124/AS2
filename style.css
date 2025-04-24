@@ -175,7 +175,7 @@ main {
   height: 40px; /* Correct player size */
   position: absolute;
   z-index: 10;
-  transition: top 0.15s ease, left 0.15s ease; /* Smooth movement transition */
+  transition: top 0.2s ease-in-out, left 0.2s ease-in-out; /* Smoother transition for movement */
 }
 
 /* Mouth overlay to show direction */
