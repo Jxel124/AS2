@@ -26,7 +26,6 @@ const scoreDisplay = document.querySelector('.score p');
 
 // Handles the start of the game when the player enters their name
 startBtn.addEventListener('click', () => {
-  // Ensure the player has entered a name
   if (nameInput.value.trim() === "") {
     alert("Please enter your name!");
     return;
@@ -92,15 +91,13 @@ function movePlayerToGrid() {
 
 // Animation loop for smooth direction tracking
 function animatePlayer() {
-  // Reduced movement speed to slow down the player
-  const speed = 0.05; // Slower movement, smaller steps
+  // Check and attempt to move the player in the correct direction
+  if (upPressed)    attemptMove(-0.05, 0, 'up');
+  if (downPressed)  attemptMove(0.05, 0, 'down');
+  if (leftPressed)  attemptMove(0, -0.05, 'left');
+  if (rightPressed) attemptMove(0, 0.05, 'right');
 
-  if (upPressed)    attemptMove(-speed, 0, 'up'); // Move player slowly
-  if (downPressed)  attemptMove(speed, 0, 'down');
-  if (leftPressed)  attemptMove(0, -speed, 'left');
-  if (rightPressed) attemptMove(0, speed, 'right');
-
-  requestAnimationFrame(animatePlayer); // Continue the loop for smooth movement
+  requestAnimationFrame(animatePlayer); // Keep the animation loop going for smooth movement
 }
 
 // Attempts to move in the given direction
