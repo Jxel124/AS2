@@ -91,10 +91,11 @@ function movePlayerToGrid() {
 
 // Animation loop for smooth direction tracking
 function animatePlayer() {
-  if (upPressed)    attemptMove(-1, 0, 'up');
-  if (downPressed)  attemptMove(1, 0, 'down');
-  if (leftPressed)  attemptMove(0, -1, 'left');
-  if (rightPressed) attemptMove(0, 1, 'right');
+  // Check and attempt to move the player in the correct direction
+  if (upPressed)    attemptMove(-0.025, 0, 'up'); // Adjusted movement speed for slower movement
+  if (downPressed)  attemptMove(0.025, 0, 'down');
+  if (leftPressed)  attemptMove(0, -0.025, 'left');
+  if (rightPressed) attemptMove(0, 0.025, 'right');
 
   requestAnimationFrame(animatePlayer); // Keep the animation loop going for smooth movement
 }
