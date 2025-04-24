@@ -72,7 +72,7 @@ header h1 {
   height: 80vh;
   position: relative;
   box-sizing: border-box;
-  overflow: hidden; /* Prevent player from visually leaving the area */
+  overflow: hidden;
 }
 
 /* Maze grid structure */
@@ -175,6 +175,7 @@ main {
   height: 40px;
   position: absolute;
   z-index: 10;
+  transition: top 0.1s, left 0.1s;
 }
 
 /* Mouth overlay to show direction */
