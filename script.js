@@ -80,7 +80,7 @@ for (let row = 0; row < maze.length; row++) {
 const player = document.getElementById('player');
 const playerMouth = player.querySelector('.mouth');
 
-// Set initial pixel position based on spawn point
+// Set player position in pixels inside the game area
 player.style.position = 'absolute';
 player.style.left = player.offsetLeft + 'px';
 player.style.top = player.offsetTop + 'px';
@@ -94,14 +94,14 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { rightPressed = true; upPressed = downPressed = leftPressed = false; }
 });
 
-// This function moves the player a few pixels per frame, based on held key
+// Moves the player every animation frame based on current direction
 function glideMove() {
   if (!gameStarted || !canMove) {
     requestAnimationFrame(glideMove);
     return;
   }
 
-  let speed = 2; // pixels per frame
+  let speed = 2;
   let moveX = 0;
   let moveY = 0;
 
@@ -110,10 +110,8 @@ function glideMove() {
   if (leftPressed)  moveX = -speed;
   if (rightPressed) moveX = speed;
 
-  // Midpoint of where player would move next
   const futureX = player.offsetLeft + moveX + player.offsetWidth / 2;
   const futureY = player.offsetTop + moveY + player.offsetHeight / 2;
-
   const el = document.elementFromPoint(futureX, futureY);
   const isBlocked = el && el.classList.contains('wall');
 
@@ -122,7 +120,7 @@ function glideMove() {
     player.style.top = player.offsetTop + moveY + 'px';
   }
 
-  // Changes the mouth direction to match input
+  // Updates the mouth direction to match movement
   if (moveX > 0)      playerMouth.className = 'mouth right';
   else if (moveX < 0) playerMouth.className = 'mouth left';
   else if (moveY < 0) playerMouth.className = 'mouth up';
@@ -133,9 +131,9 @@ function glideMove() {
   requestAnimationFrame(glideMove);
 }
 
-requestAnimationFrame(glideMove); // Starts the smooth movement loop
+requestAnimationFrame(glideMove); // Starts the movement loop
 
-// Checks if the player overlaps a point and removes it
+// Checks if player touches a point and increases score
 function checkPointCollision() {
   const playerBox = player.getBoundingClientRect();
 
@@ -161,7 +159,7 @@ function checkPointCollision() {
   }
 }
 
-// Checks if the player has touched an enemy
+// Checks if the player touches an enemy and handles collision
 function checkEnemyCollision() {
   const playerBox = player.getBoundingClientRect();
   document.querySelectorAll('.enemy').forEach(enemy => {
@@ -178,7 +176,7 @@ function checkEnemyCollision() {
   });
 }
 
-// Runs when the player touches an enemy
+// Handles what happens when the player hits an enemy
 function handleEnemyCollision() {
   lives--;
   canMove = false;
@@ -201,7 +199,7 @@ function handleEnemyCollision() {
   }, 1000);
 }
 
-// AI movement — enemies pick random valid directions
+// Moves enemies in a random direction every 0.5 seconds
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -230,7 +228,7 @@ setInterval(() => {
   });
 }, 500);
 
-// Save leaderboard to localStorage
+// Saves score and name to local storage leaderboard
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   scores.push({ name: playerName, score });
@@ -239,7 +237,7 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
-// Load the scores on startup
+// Loads and displays saved leaderboard scores
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
