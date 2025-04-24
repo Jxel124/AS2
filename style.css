@@ -5,7 +5,7 @@
   margin: 0;
   padding: 0;
   color: white;
-  font-family: 'Press Start 2P';
+  font-family: 'Press Start 2P'; /* Font used for the entire game */
 }
 
 /* Layout for the full game screen */
@@ -21,7 +21,7 @@ body {
     "lboard main controls";
   align-items: start;
   justify-items: center;
-  overflow: hidden;
+  overflow: hidden; /* Hide overflow to maintain the game area */
 }
 
 /* Top banner */
@@ -32,7 +32,7 @@ header {
 }
 
 header h1 {
-  font-size: 4em;
+  font-size: 4em; /* Size for the game title */
 }
 
 /* Start screen overlay */
@@ -41,17 +41,17 @@ header h1 {
   display: flex;
   height: 100vh;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.9); /* Overlay background */
   align-items: center;
   justify-content: center;
-  z-index: 200;
+  z-index: 200; /* Ensure it's above all other elements */
 }
 
 /* Container inside start screen */
 .startDiv div {
   background-color: #ccc;
   border-radius: 20px;
-  box-shadow: 4px 4px 4px #000;
+  box-shadow: 4px 4px 4px #000; /* Shadow for the start screen box */
   padding: 20px 30px;
   display: flex;
   align-items: center;
@@ -72,7 +72,7 @@ header h1 {
   height: 80vh;
   position: relative;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: hidden; /* Hide overflow to maintain the game area */
 }
 
 /* Maze grid structure */
@@ -175,7 +175,7 @@ main {
   height: 90%; /* Player size updated to match enemy size */
   position: absolute;
   z-index: 10;
-  transition: top 0.15s ease, left 0.15s ease; /* Smooth movement */
+  transition: top 0.15s ease, left 0.15s ease; /* Smooth movement transition */
 }
 
 /* Mouth overlay to show direction */
