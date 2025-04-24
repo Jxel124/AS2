@@ -34,6 +34,7 @@ startBtn.addEventListener('click', () => {
   gameStarted = true;
   startScreen.style.display = 'none';
   movePlayerToGrid();
+  requestAnimationFrame(animatePlayer);
 });
 
 // Maze layout: Player = 2, Wall = 1, Enemy = 3, Point = 0
@@ -88,47 +89,52 @@ function movePlayerToGrid() {
   player.style.top = playerTop * tileSize + 'px';
 }
 
-// Handles key presses for tile-based movement
-document.addEventListener('keydown', (e) => {
-  if (!gameStarted || !canMove) return;
+// Animation loop for smooth direction tracking
+function animatePlayer() {
+  if (upPressed)    attemptMove(-1, 0, 'up');
+  if (downPressed)  attemptMove(1, 0, 'down');
+  if (leftPressed)  attemptMove(0, -1, 'left');
+  if (rightPressed) attemptMove(0, 1, 'right');
 
-  let nextRow = playerTop;
-  let nextCol = playerLeft;
+  requestAnimationFrame(animatePlayer);
+}
 
-  if (e.key === 'ArrowUp') {
-    nextRow--;
-    playerMouth.className = 'mouth up';
-  } else if (e.key === 'ArrowDown') {
-    nextRow++;
-    playerMouth.className = 'mouth down';
-  } else if (e.key === 'ArrowLeft') {
-    nextCol--;
-    playerMouth.className = 'mouth left';
-  } else if (e.key === 'ArrowRight') {
-    nextCol++;
-    playerMouth.className = 'mouth right';
-  } else {
-    return;
-  }
+// Attempts to move in the given direction
+function attemptMove(rowOffset, colOffset, direction) {
+  if (!canMove) return;
 
+  const nextRow = playerTop + rowOffset;
+  const nextCol = playerLeft + colOffset;
   const nextTile = maze[nextRow]?.[nextCol];
 
   if (nextTile !== undefined && nextTile !== 1) {
     playerTop = nextRow;
     playerLeft = nextCol;
     movePlayerToGrid();
+    playerMouth.className = `mouth ${direction}`;
     checkPointCollision();
     checkEnemyCollision();
   }
+
+  canMove = false;
+  setTimeout(() => { canMove = true; }, 150);
+}
+
+// Keyboard input
+document.addEventListener('keydown', e => {
+  if (!gameStarted) return;
+  if (e.key === 'ArrowUp')    { upPressed = true; downPressed = leftPressed = rightPressed = false; }
+  if (e.key === 'ArrowDown')  { downPressed = true; upPressed = leftPressed = rightPressed = false; }
+  if (e.key === 'ArrowLeft')  { leftPressed = true; upPressed = downPressed = rightPressed = false; }
+  if (e.key === 'ArrowRight') { rightPressed = true; upPressed = downPressed = leftPressed = false; }
 });
 
 // Checks if the player overlaps a point
 function checkPointCollision() {
   document.querySelectorAll('.point').forEach(point => {
-    const pointRow = parseInt(point.style.gridRowStart) - 1;
-    const pointCol = parseInt(point.style.gridColumnStart) - 1;
-
-    if (pointRow === playerTop && pointCol === playerLeft) {
+    const row = parseInt(point.style.gridRowStart) - 1;
+    const col = parseInt(point.style.gridColumnStart) - 1;
+    if (row === playerTop && col === playerLeft) {
       point.remove();
       score++;
       scoreDisplay.textContent = score;
