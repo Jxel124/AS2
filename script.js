@@ -110,31 +110,33 @@ function glideMove() {
   if (leftPressed)  moveX = -speed;
   if (rightPressed) moveX = speed;
 
-  const nextX = player.offsetLeft + moveX + player.offsetWidth / 2;
-  const nextY = player.offsetTop + moveY + player.offsetHeight / 2;
+  const gameArea = main.getBoundingClientRect();
+  const playerBox = player.getBoundingClientRect();
 
-  const gameArea = document.querySelector('.gameArea').getBoundingClientRect();
-  const playerW = player.offsetWidth;
-  const playerH = player.offsetHeight;
+  const newLeft = player.offsetLeft + moveX;
+  const newTop = player.offsetTop + moveY;
+  const newRight = newLeft + player.offsetWidth;
+  const newBottom = newTop + player.offsetHeight;
 
-  // Make sure player stays inside the maze area
   const insideBounds =
-    nextX - playerW / 2 >= 0 &&
-    nextX + playerW / 2 <= gameArea.width &&
-    nextY - playerH / 2 >= 0 &&
-    nextY + playerH / 2 <= gameArea.height;
+    newLeft >= 0 &&
+    newTop >= 0 &&
+    newRight <= gameArea.width &&
+    newBottom <= gameArea.height;
 
   if (insideBounds) {
-    const el = document.elementFromPoint(nextX, nextY);
+    const checkX = newLeft + player.offsetWidth / 2;
+    const checkY = newTop + player.offsetHeight / 2;
+
+    const el = document.elementFromPoint(checkX, checkY);
     const isBlocked = el && el.classList.contains('wall');
 
     if (!isBlocked) {
-      player.style.left = player.offsetLeft + moveX + 'px';
-      player.style.top = player.offsetTop + moveY + 'px';
+      player.style.left = newLeft + 'px';
+      player.style.top = newTop + 'px';
     }
   }
 
-  // Updates the mouth direction to match movement
   if (moveX > 0)      playerMouth.className = 'mouth right';
   else if (moveX < 0) playerMouth.className = 'mouth left';
   else if (moveY < 0) playerMouth.className = 'mouth up';
@@ -265,3 +267,4 @@ function loadLeaderboard() {
 }
 
 loadLeaderboard();
+
