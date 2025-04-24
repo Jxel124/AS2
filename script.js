@@ -124,22 +124,14 @@ document.addEventListener('keydown', (e) => {
 
 // Checks if the player overlaps a point
 function checkPointCollision() {
-  const playerBox = player.getBoundingClientRect();
+  const tileIndex = playerTop * 10 + playerLeft;
+  const tile = document.querySelectorAll('.point')[tileIndex];
 
-  document.querySelectorAll('.point').forEach(point => {
-    const box = point.getBoundingClientRect();
-    const touching = (
-      playerBox.right > box.left &&
-      playerBox.left < box.right &&
-      playerBox.bottom > box.top &&
-      playerBox.top < box.bottom
-    );
-    if (touching) {
-      point.remove();
-      score++;
-      scoreDisplay.textContent = score;
-    }
-  });
+  if (tile && tile.style.gridRowStart == playerTop + 1 && tile.style.gridColumnStart == playerLeft + 1) {
+    tile.remove();
+    score++;
+    scoreDisplay.textContent = score;
+  }
 
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
