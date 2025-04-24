@@ -10,8 +10,8 @@ let rightPressed = false;
 let score = 0;
 let lives = 3;
 let canMove = true;
-let playerTop = 1;
-let playerLeft = 1;
+let playerTop = 0;
+let playerLeft = 0;
 
 let playerName = "";
 
@@ -21,7 +21,7 @@ const startScreen = document.querySelector('#startScreen');
 const nameInput = document.querySelector('#playerNameInput');
 const scoreDisplay = document.querySelector('.score p');
 
-// Starts the game after a valid name is entered
+// Handles the start of the game when the player enters their name
 startBtn.addEventListener('click', () => {
   if (nameInput.value.trim() === "") {
     alert("Please enter your name!");
@@ -46,7 +46,7 @@ let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
-// Render the maze layout
+// Builds the maze using grid elements
 for (let row = 0; row < maze.length; row++) {
   for (let col = 0; col < maze[row].length; col++) {
     const cell = maze[row][col];
@@ -55,12 +55,15 @@ for (let row = 0; row < maze.length; row++) {
     block.style.gridRowStart = row + 1;
     block.style.gridColumnStart = col + 1;
 
-    if (cell === 1) block.classList.add('wall');
-    else if (cell === 2) {
+    if (cell === 1) {
+      block.classList.add('wall');
+    } else if (cell === 2) {
       block.id = 'player';
       const mouth = document.createElement('div');
       mouth.classList.add('mouth');
       block.appendChild(mouth);
+      playerTop = row;
+      playerLeft = col;
     } else if (cell === 3) {
       block.classList.add('enemy');
     } else {
@@ -74,27 +77,42 @@ for (let row = 0; row < maze.length; row++) {
 const player = document.getElementById('player');
 const playerMouth = player.querySelector('.mouth');
 
-// Listen to movement keys
-document.addEventListener('keydown', e => {
+// Detect key presses
+document.addEventListener('keydown', (e) => {
+  if (!gameStarted) return;
+
+  if (e.key === 'ArrowUp') upPressed = true;
+  if (e.key === 'ArrowDown') downPressed = true;
+  if (e.key === 'ArrowLeft') leftPressed = true;
+  if (e.key === 'ArrowRight') rightPressed = true;
+});
+
+document.addEventListener('keyup', (e) => {
+  if (e.key === 'ArrowUp') upPressed = false;
+  if (e.key === 'ArrowDown') downPressed = false;
+  if (e.key === 'ArrowLeft') leftPressed = false;
+  if (e.key === 'ArrowRight') rightPressed = false;
+});
+
+// Main game loop
+setInterval(() => {
   if (!gameStarted || !canMove) return;
 
   let nextRow = playerTop;
   let nextCol = playerLeft;
 
-  if (e.key === 'ArrowUp') {
-    nextRow--;
-    playerMouth.className = 'mouth up';
-  } else if (e.key === 'ArrowDown') {
+  if (downPressed) {
     nextRow++;
     playerMouth.className = 'mouth down';
-  } else if (e.key === 'ArrowLeft') {
+  } else if (upPressed) {
+    nextRow--;
+    playerMouth.className = 'mouth up';
+  } else if (leftPressed) {
     nextCol--;
     playerMouth.className = 'mouth left';
-  } else if (e.key === 'ArrowRight') {
+  } else if (rightPressed) {
     nextCol++;
     playerMouth.className = 'mouth right';
-  } else {
-    return;
   }
 
   if (maze[nextRow][nextCol] !== 1) {
@@ -103,15 +121,9 @@ document.addEventListener('keydown', e => {
     player.style.gridRowStart = playerTop + 1;
     player.style.gridColumnStart = playerLeft + 1;
   }
-});
-
-// Repeatedly check collisions
-setInterval(() => {
-  if (!gameStarted || !canMove) return;
 
   const playerBox = player.getBoundingClientRect();
 
-  // Point collision check
   document.querySelectorAll('.point').forEach(point => {
     const pointBox = point.getBoundingClientRect();
     const isColliding = (
@@ -127,29 +139,28 @@ setInterval(() => {
     }
   });
 
-  // All points eaten
+  // Win check
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
     location.reload();
   }
 
-  // Enemy collision check
   document.querySelectorAll('.enemy').forEach(enemy => {
     const enemyBox = enemy.getBoundingClientRect();
-    const isTouchingEnemy = (
+    const isTouching = (
       playerBox.right > enemyBox.left &&
       playerBox.left < enemyBox.right &&
       playerBox.bottom > enemyBox.top &&
       playerBox.top < enemyBox.bottom
     );
-    if (isTouchingEnemy) {
+    if (isTouching) {
       handleEnemyCollision();
     }
   });
-}, 100);
+}, 300); // Adjusted for more classic feel
 
-// Moves enemies toward player (every second)
+// Moves enemies toward player
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -176,9 +187,9 @@ setInterval(() => {
       enemy.style.gridColumnStart = newX + 1;
     }
   });
-}, 1000);
+}, 1200);
 
-// Handles losing a life
+// Handles life loss and reset animation
 function handleEnemyCollision() {
   lives--;
   canMove = false;
@@ -191,17 +202,17 @@ function handleEnemyCollision() {
 
   setTimeout(() => {
     player.classList.remove('hit');
+    canMove = true;
+
     if (lives <= 0) {
       saveHighScore();
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
-    } else {
-      canMove = true;
     }
   }, 1000);
 }
 
-// Store high scores locally
+// Save top scores
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   scores.push({ name: playerName, score: score });
@@ -210,7 +221,7 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
-// Load scores and display
+// Load scores when game starts
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
@@ -224,4 +235,3 @@ function loadLeaderboard() {
 }
 
 loadLeaderboard();
-
