@@ -46,7 +46,7 @@ let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
-// Builds the maze using grid elements
+// Populates the maze in the HTML
 for (let row = 0; row < maze.length; row++) {
   for (let col = 0; col < maze[row].length; col++) {
     const cell = maze[row][col];
@@ -80,7 +80,6 @@ const playerMouth = player.querySelector('.mouth');
 // Keyboard movement listeners
 document.addEventListener('keydown', (e) => {
   if (!gameStarted) return;
-
   if (e.key === 'ArrowUp') upPressed = true;
   if (e.key === 'ArrowDown') downPressed = true;
   if (e.key === 'ArrowLeft') leftPressed = true;
@@ -94,7 +93,7 @@ document.addEventListener('keyup', (e) => {
   if (e.key === 'ArrowRight') rightPressed = false;
 });
 
-// Main game loop to update movement and point detection
+// This loop updates the player's movement and interactions
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
@@ -124,7 +123,7 @@ setInterval(() => {
 
   const playerBox = player.getBoundingClientRect();
 
-  // Check for point collision
+  // Point collection
   document.querySelectorAll('.point').forEach(point => {
     const pointBox = point.getBoundingClientRect();
     const isColliding = (
@@ -133,7 +132,6 @@ setInterval(() => {
       playerBox.bottom > pointBox.top &&
       playerBox.top < pointBox.bottom
     );
-
     if (isColliding) {
       point.remove();
       score++;
@@ -141,14 +139,13 @@ setInterval(() => {
     }
   });
 
-  // Check for win condition
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
     location.reload();
   }
 
-  // Check for enemy collision
+  // Enemy collision detection
   document.querySelectorAll('.enemy').forEach(enemy => {
     const enemyBox = enemy.getBoundingClientRect();
     const isTouchingEnemy = (
@@ -157,14 +154,13 @@ setInterval(() => {
       playerBox.bottom > enemyBox.top &&
       playerBox.top < enemyBox.bottom
     );
-
     if (isTouchingEnemy) {
       handleEnemyCollision();
     }
   });
 }, 150);
 
-// Enemy AI movement interval
+// Enemy AI movement toward player
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -193,7 +189,7 @@ setInterval(() => {
   });
 }, 1000);
 
-// Reduces life and handles death animation
+// Handles enemy collision response
 function handleEnemyCollision() {
   lives--;
   canMove = false;
@@ -216,7 +212,7 @@ function handleEnemyCollision() {
   }, 1000);
 }
 
-// Save top 5 scores to local storage
+// Save the score and name to local storage
 function saveHighScore() {
   let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   scores.push({ name: playerName, score: score });
@@ -225,7 +221,7 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
-// Load scores to display them in the leaderboard
+// Loads leaderboard from local storage into the HTML list
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
