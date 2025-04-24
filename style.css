@@ -43,6 +43,7 @@ header {
     padding: 20px 30px;
     display: flex;
     height: 32px;
+    align-items: center;
 }
 
 .startDiv h1 {
@@ -228,4 +229,16 @@ button:nth-child(4) { grid-area: downArrow; }
 
 .hit {
     animation: hitAnimation 1.5s ease-in-out;
+}
+
+/* Style for the name input on the start screen */
+#playerNameInput {
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    padding: 10px 15px;
+    font-size: 0.75em;
+    font-family: 'Press Start 2P';
+    margin-left: 10px;
+    width: 200px;
 }
