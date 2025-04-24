@@ -34,16 +34,16 @@ startBtn.addEventListener('click', () => {
 
 // Maze layout: Player = 2, Wall = 1, Enemy = 3, Point = 0
 let maze = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 2, 0, 1, 0, 0, 0, 0, 3, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-  [1, 0, 0, 1, 0, 3, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-  [1, 3, 1, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  [1,1,1,1,1,1,1,1,1,1],
+  [1,2,0,1,0,0,0,0,3,1],
+  [1,0,0,0,0,0,0,1,1,1],
+  [1,0,0,0,0,0,0,0,0,1],
+  [1,0,1,1,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,1,1,1],
+  [1,0,0,1,0,3,0,0,0,1],
+  [1,0,0,0,0,0,0,1,0,1],
+  [1,3,1,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1]
 ];
 
 // Builds the maze using grid elements
@@ -77,10 +77,9 @@ for (let row = 0; row < maze.length; row++) {
 const player = document.getElementById('player');
 const playerMouth = player.querySelector('.mouth');
 
-// Movement listeners for arrow keys
+// Handles key presses
 document.addEventListener('keydown', (e) => {
   if (!gameStarted) return;
-
   if (e.key === 'ArrowUp') upPressed = true;
   if (e.key === 'ArrowDown') downPressed = true;
   if (e.key === 'ArrowLeft') leftPressed = true;
@@ -94,7 +93,7 @@ document.addEventListener('keyup', (e) => {
   if (e.key === 'ArrowRight') rightPressed = false;
 });
 
-// Handles player movement with a smooth step delay for sliding
+// Game loop: manages movement, collision, scoring
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
@@ -115,6 +114,7 @@ setInterval(() => {
     playerMouth.className = 'mouth right';
   }
 
+  // Check wall collision
   if (maze[nextRow][nextCol] !== 1) {
     playerTop = nextRow;
     playerLeft = nextCol;
@@ -124,7 +124,7 @@ setInterval(() => {
 
   const playerBox = player.getBoundingClientRect();
 
-  // Check if the player overlaps any point
+  // Point collection
   document.querySelectorAll('.point').forEach(point => {
     const pointBox = point.getBoundingClientRect();
     const isColliding = (
@@ -133,7 +133,6 @@ setInterval(() => {
       playerBox.bottom > pointBox.top &&
       playerBox.top < pointBox.bottom
     );
-
     if (isColliding) {
       point.remove();
       score++;
@@ -141,14 +140,14 @@ setInterval(() => {
     }
   });
 
-  // When all points are collected
+  // Game over if all points are collected
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
     location.reload();
   }
 
-  // Checks if an enemy touches the player
+  // Enemy collision detection
   document.querySelectorAll('.enemy').forEach(enemy => {
     const enemyBox = enemy.getBoundingClientRect();
     const isTouchingEnemy = (
@@ -162,9 +161,10 @@ setInterval(() => {
       handleEnemyCollision();
     }
   });
-}, 175); // Delay makes movement feel more classic Pac-Man
 
-// Moves each enemy toward the player every half second
+}, 175); // Smooth step-like motion
+
+// Enemies chase player by calculating direction every 0.5s
 setInterval(() => {
   if (!gameStarted) return;
 
@@ -191,9 +191,9 @@ setInterval(() => {
       enemy.style.gridColumnStart = newX + 1;
     }
   });
-}, 500); // Enemy moves every 0.5s
+}, 500);
 
-// Handles what happens when the player hits an enemy
+// Handles player getting hit by an enemy
 function handleEnemyCollision() {
   lives--;
   canMove = false;
@@ -213,7 +213,7 @@ function handleEnemyCollision() {
       const restart = confirm("Game Over! Restart?");
       if (restart) location.reload();
     }
-  }, 1000);
+  }, 1000); // Animation time
 }
 
 // Save leaderboard to localStorage
@@ -225,7 +225,7 @@ function saveHighScore() {
   localStorage.setItem("leaderboard", JSON.stringify(scores));
 }
 
-// Loads scores from localStorage and updates UI
+// Load and show leaderboard
 function loadLeaderboard() {
   const scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
   const list = document.getElementById("leaderboardList");
@@ -239,4 +239,3 @@ function loadLeaderboard() {
 }
 
 loadLeaderboard();
-
