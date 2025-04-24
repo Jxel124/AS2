@@ -14,32 +14,28 @@
     <h1>Snack Man!</h1>
   </header>
 
-  <!-- This is the start screen that shows when the game first loads -->
+  <!-- Start screen with player name input -->
   <div class="startDiv" id="startScreen">
     <div class="start">
       <img src="images/icon.png" alt="logo">
       <h1>Snack Man!</h1>
+      <input type="text" id="playerNameInput" placeholder="Enter your name" />
       <button id="startBtn">Start Game</button>
     </div>
   </div>
 
-  <!-- Just a placeholder leaderboard with fake scores for now -->
+  <!-- Leaderboard shows top 5 scores from localStorage -->
   <div class="leaderboard">
     <h1>LeaderBoard:</h1>
-    <ol>
-      <li>Chris........100</li>
-      <li>Mark.........75</li>
-      <li>Tom..........50</li>
-      <li>John.........45</li>
-      <li>John2........40</li>
-      <li>John3........35</li>
+    <ol id="leaderboardList">
+      <!-- Dynamically filled in by script.js -->
     </ol>
   </div>
 
-  <!-- This is where the maze grid and player will appear -->
+  <!-- Game grid -->
   <main></main>
 
-  <!-- This shows how many lives the player has left -->
+  <!-- Remaining lives -->
   <div class="lives">
     <h1>Lives:</h1>
     <ul>
@@ -49,18 +45,18 @@
     </ul>
   </div>
 
-  <!-- Score display: this updates when the player collects points -->
+  <!-- Current score during gameplay -->
   <div class="score">
     <h1>Score:</h1>
     <p>0</p>
   </div>
 
-  <!-- These are the on-screen buttons for controlling the player -->
+  <!-- Mobile control buttons -->
   <div class="controls">
-    <button id="lbttn">&#9664;</button> <!-- Left -->
-    <button id="ubttn">&#9650;</button> <!-- Up -->
-    <button id="rbttn">&#9654;</button> <!-- Right -->
-    <button id="dbttn">&#9660;</button> <!-- Down -->
+    <button id="lbttn">&#9664;</button>
+    <button id="ubttn">&#9650;</button>
+    <button id="rbttn">&#9654;</button>
+    <button id="dbttn">&#9660;</button>
   </div>
 </body>
 </html>
