@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* Universal Reset and Font */
 * {
   margin: 0;
   padding: 0;
@@ -7,6 +8,7 @@
   font-family: 'Press Start 2P';
 }
 
+/* Layout for the full game screen */
 body {
   background-color: black;
   height: 100vh;
@@ -17,15 +19,23 @@ body {
     "header header header"
     "lboard main score"
     "lboard main controls";
-  align-items: center;
+  align-items: start;
   justify-items: center;
+  overflow: hidden;
 }
 
+/* Top banner */
 header {
   grid-area: header;
   text-align: center;
+  padding-top: 0.5em;
 }
 
+header h1 {
+  font-size: 4em;
+}
+
+/* Start screen overlay */
 .startDiv {
   position: absolute;
   display: flex;
@@ -34,105 +44,127 @@ header {
   background-color: rgba(0, 0, 0, 0.9);
   align-items: center;
   justify-content: center;
+  z-index: 200;
 }
 
+/* Container inside start screen */
 .startDiv div {
   background-color: #ccc;
-  z-index: 100;
   border-radius: 20px;
   box-shadow: 4px 4px 4px #000;
   padding: 20px 30px;
   display: flex;
-  height: 64px;
   align-items: center;
+  gap: 1em;
+  height: 64px;
 }
 
 .startDiv h1 {
-  text-shadow: 2px 2px 2px #000;
   font-size: 2em;
-  margin-left: 10px;
+  color: black;
+  text-shadow: 2px 2px 2px #000;
 }
 
-header h1 {
-  font-size: 4em;
-}
-
-/* This is the game container the player moves inside */
+/* Maze area (main play space) */
 .gameArea {
   grid-area: main;
   width: 80vh;
   height: 80vh;
   position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-/* Maze layout grid */
+/* Maze grid structure */
 main {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
 }
 
-/* Each cell in the maze */
+/* Maze blocks styling */
 .block {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.lives {
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  margin: 0.5em;
-}
-
-.lives li {
-  list-style: none;
-  background-color: yellow;
-  width: 2em;
-  height: 2em;
-  border-radius: 100%;
-  margin: 5px;
-}
-
-.lives ul {
-  display: flex;
-}
-
-.score {
-  grid-area: score;
-}
-
+/* Leaderboard section */
 .leaderboard {
   grid-area: lboard;
+  align-self: start;
+  padding-top: 2em;
+  width: 100%;
+  max-width: 250px;
+}
+
+.leaderboard h1 {
+  font-size: 1.25em;
+  text-decoration: underline;
+  text-align: left;
+  padding-left: 0.5em;
 }
 
 .leaderboard ol {
-  margin-left: 2.5em;
+  list-style-position: inside;
+  padding-left: 0.5em;
   margin-top: 1em;
   text-align: left;
 }
 
 .leaderboard ol li {
   font-size: 0.85em;
-  padding: 1em 0;
+  padding: 0.75em 0;
 }
 
-div {
+/* Score display */
+.score {
+  grid-area: score;
+  padding-top: 2em;
   text-align: center;
 }
 
-div h1 {
+.score h1 {
   font-size: 1.25em;
   text-decoration: underline;
 }
 
-div p {
-  margin: 0.5em;
+.score p {
   font-size: 2em;
+  margin-top: 0.5em;
+}
+
+/* Lives indicator styling */
+.lives {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 1em;
+  z-index: 50;
+}
+
+.lives h1 {
+  font-size: 1em;
+  text-decoration: underline;
+}
+
+.lives ul {
+  display: flex;
+  gap: 0.25em;
+  list-style: none;
+}
+
+.lives li {
+  background-color: yellow;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
 }
 
 /* Player style */
@@ -145,7 +177,7 @@ div p {
   z-index: 10;
 }
 
-/* The animated mouth overlay */
+/* Mouth overlay to show direction */
 .mouth {
   position: absolute;
   top: 0;
@@ -154,6 +186,7 @@ div p {
   height: 100%;
 }
 
+/* Enemy styling */
 .enemy {
   background-color: green;
   border-radius: 100%;
@@ -162,6 +195,7 @@ div p {
   position: relative;
 }
 
+/* Point styling */
 .point {
   background-color: white;
   border-radius: 100%;
@@ -169,13 +203,14 @@ div p {
   height: 8px;
 }
 
+/* Wall block styling */
 .wall {
   background-color: blue;
   width: 100%;
   height: 100%;
 }
 
-/* Mouth animation using opacity flicker */
+/* Mouth direction animations */
 .up, .down, .left, .right {
   background-color: black;
   animation: mouth 1.25s infinite steps(1, end);
@@ -191,7 +226,7 @@ div p {
   50% { opacity: 0; }
 }
 
-/* Directional buttons */
+/* Controller buttons */
 .controls {
   grid-area: controls;
   display: grid;
@@ -203,6 +238,9 @@ div p {
     ". downArrow .";
   width: 25vh;
   height: 25vh;
+  align-items: center;
+  justify-items: center;
+  padding-top: 1em;
 }
 
 button {
@@ -211,6 +249,9 @@ button {
   font-family: 'Press Start 2P';
   font-size: 1em;
   border: none;
+  padding: 0.5em;
+  width: 5vh;
+  height: 5vh;
 }
 
 button:nth-child(1) { grid-area: leftArrow; }
@@ -218,7 +259,7 @@ button:nth-child(2) { grid-area: upArrow; }
 button:nth-child(3) { grid-area: rightArrow; }
 button:nth-child(4) { grid-area: downArrow; }
 
-/* Hit effect when colliding with an enemy */
+/* Animation when hit or dead */
 @keyframes deathAnimation {
   0% { transform: scale(1); }
   50% { transform: scale(0.5); }
@@ -238,7 +279,7 @@ button:nth-child(4) { grid-area: downArrow; }
   animation: hitAnimation 1s ease-in-out;
 }
 
-/* Name input field before game starts */
+/* Input for player name */
 #playerNameInput {
   background-color: black;
   color: white;
