@@ -1,4 +1,3 @@
-// Tracks whether the game has started or not
 let gameStarted = false;
 
 // These flags monitor which direction keys are being held
@@ -26,7 +25,6 @@ const scoreDisplay = document.querySelector('.score p');
 
 // Handles the start of the game when the player enters their name
 startBtn.addEventListener('click', () => {
-  // Ensure the player has entered a name
   if (nameInput.value.trim() === "") {
     alert("Please enter your name!");
     return;
@@ -92,11 +90,10 @@ function movePlayerToGrid() {
 
 // Animation loop for smooth direction tracking
 function animatePlayer() {
-  // Check and attempt to move the player in the correct direction
-  if (upPressed)    attemptMove(-0.05, 0, 'up'); // Adjusted movement speed for smoother transition
-  if (downPressed)  attemptMove(0.05, 0, 'down');
-  if (leftPressed)  attemptMove(0, -0.05, 'left');
-  if (rightPressed) attemptMove(0, 0.05, 'right');
+  if (upPressed)    attemptMove(-1, 0, 'up'); 
+  if (downPressed)  attemptMove(1, 0, 'down');
+  if (leftPressed)  attemptMove(0, -1, 'left');
+  if (rightPressed) attemptMove(0, 1, 'right');
 
   requestAnimationFrame(animatePlayer); // Keep the animation loop going for smooth movement
 }
@@ -243,3 +240,4 @@ function loadLeaderboard() {
 }
 
 loadLeaderboard();
+
