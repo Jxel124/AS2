@@ -160,7 +160,8 @@ main {
   list-style: none;
 }
 
-.lives li {
+/* Dynamically created life icons from JavaScript */
+#lifeList li {
   background-color: yellow;
   width: 2em;
   height: 2em;
