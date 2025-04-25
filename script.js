@@ -125,7 +125,7 @@ setInterval(() => {
     checkPointCollision();
     checkEnemyCollision();
   }
-}, 150); // 150ms = ~6.6 tiles per second
+}, 200); // 200ms = ~5 tiles per second
 
 // Keyboard input for player movement
 document.addEventListener('keydown', e => {
