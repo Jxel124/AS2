@@ -34,6 +34,7 @@ startBtn.addEventListener('click', () => {
   gameStarted = true;
   startScreen.style.display = 'none'; // Hide the start screen
   movePlayerToGrid(); // Position player on the grid
+  createLives(); // Dynamically add 3 lives
 });
 
 // Maze layout: Player = 2, Wall = 1, Enemy = 3, Point = 0
@@ -88,7 +89,7 @@ function movePlayerToGrid() {
   player.style.top = playerTop * tileSize + 'px';
 }
 
-// Movement tick every 150ms (grid step)
+// Movement tick every 300ms (grid step)
 setInterval(() => {
   if (!gameStarted || !canMove) return;
 
@@ -180,21 +181,26 @@ function handleEnemyCollision() {
   canMove = false;
   player.classList.add('hit');
 
-  const lifeIcons = document.querySelectorAll('.lives li');
+  // Update the life icons dynamically
+  const lifeIcons = document.querySelectorAll('#lifeList li');
   if (lifeIcons[lives]) {
     lifeIcons[lives].style.backgroundColor = 'transparent';
   }
 
+  // Freeze movement and show hit animation for 1.5s
   setTimeout(() => {
     player.classList.remove('hit');
     canMove = true;
 
     if (lives <= 0) {
-      saveHighScore();
-      const restart = confirm("Game Over! Restart?");
-      if (restart) location.reload();
+      player.classList.add('dead'); // Trigger death animation
+      setTimeout(() => {
+        saveHighScore();
+        const restart = confirm("Game Over! Restart?");
+        if (restart) location.reload();
+      }, 1500); // Wait for death animation to finish
     }
-  }, 1000);
+  }, 1500);
 }
 
 // Moves enemies in a random valid direction every 0.5 seconds
@@ -247,5 +253,32 @@ function loadLeaderboard() {
     list.appendChild(li);
   });
 }
-
 loadLeaderboard();
+
+// Creates 3 lives dynamically so we don’t rely on static HTML
+function createLives() {
+  const lifeList = document.getElementById("lifeList");
+  lifeList.innerHTML = "";
+  for (let i = 0; i < lives; i++) {
+    const li = document.createElement("li");
+    lifeList.appendChild(li);
+  }
+}
+
+// Arrow buttons on-screen (mobile support or extra controls)
+document.getElementById('ubttn').addEventListener('click', () => {
+  upPressed = true;
+  downPressed = leftPressed = rightPressed = false;
+});
+document.getElementById('dbttn').addEventListener('click', () => {
+  downPressed = true;
+  upPressed = leftPressed = rightPressed = false;
+});
+document.getElementById('lbttn').addEventListener('click', () => {
+  leftPressed = true;
+  upPressed = downPressed = rightPressed = false;
+});
+document.getElementById('rbttn').addEventListener('click', () => {
+  rightPressed = true;
+  upPressed = downPressed = leftPressed = false;
+});
