@@ -96,10 +96,9 @@ function animatePlayer() {
     return;
   }
 
-  const speed = 2; // Speed in pixels per frame
+  const speed = 2;
   const tileSize = main.offsetWidth / 10;
 
-  let moved = false;
   const currentTop = parseFloat(player.style.top || "0");
   const currentLeft = parseFloat(player.style.left || "0");
 
@@ -107,47 +106,52 @@ function animatePlayer() {
   let nextLeft = currentLeft;
 
   if (upPressed) {
-    nextTop = currentTop - speed;
-    playerMouth.className = `mouth up`;
-    moved = true;
-  }
-  if (downPressed) {
-    nextTop = currentTop + speed;
-    playerMouth.className = `mouth down`;
-    moved = true;
-  }
-  if (leftPressed) {
-    nextLeft = currentLeft - speed;
-    playerMouth.className = `mouth left`;
-    moved = true;
-  }
-  if (rightPressed) {
-    nextLeft = currentLeft + speed;
-    playerMouth.className = `mouth right`;
-    moved = true;
+    nextTop -= speed;
+    playerMouth.className = "mouth up";
+  } else if (downPressed) {
+    nextTop += speed;
+    playerMouth.className = "mouth down";
+  } else if (leftPressed) {
+    nextLeft -= speed;
+    playerMouth.className = "mouth left";
+  } else if (rightPressed) {
+    nextLeft += speed;
+    playerMouth.className = "mouth right";
+  } else {
+    requestAnimationFrame(animatePlayer);
+    return;
   }
 
-  const row = Math.floor(nextTop / tileSize);
-  const col = Math.floor(nextLeft / tileSize);
-
-  // If next tile is valid and not a wall, update position
+  // Checks if player is about to go outside the game area
   if (
-    row >= 0 &&
-    row < maze.length &&
-    col >= 0 &&
-    col < maze[0].length &&
-    maze[row][col] !== 1
+    nextTop < 0 || nextLeft < 0 ||
+    nextTop + player.offsetHeight > main.offsetHeight ||
+    nextLeft + player.offsetWidth > main.offsetWidth
   ) {
-    player.style.top = `${nextTop}px`;
-    player.style.left = `${nextLeft}px`;
-    playerTop = row;
-    playerLeft = col;
-
-    if (moved) {
-      checkPointCollision();
-      checkEnemyCollision();
-    }
+    requestAnimationFrame(animatePlayer);
+    return;
   }
+
+  // Checks if the center point of the player is about to enter a wall
+  const centerX = nextLeft + player.offsetWidth / 2;
+  const centerY = nextTop + player.offsetHeight / 2;
+  const element = document.elementFromPoint(centerX, centerY);
+
+  // If wall is detected, cancel movement
+  if (!element || element.classList.contains('wall')) {
+    requestAnimationFrame(animatePlayer);
+    return;
+  }
+
+  player.style.top = `${nextTop}px`;
+  player.style.left = `${nextLeft}px`;
+
+  // Update player’s grid position estimate for logical collision checks
+  playerTop = Math.floor(nextTop / tileSize);
+  playerLeft = Math.floor(nextLeft / tileSize);
+
+  checkPointCollision();
+  checkEnemyCollision();
 
   requestAnimationFrame(animatePlayer);
 }
@@ -164,17 +168,25 @@ document.addEventListener('keydown', e => {
 
 // Checks if the player overlaps a point
 function checkPointCollision() {
+  const playerBox = player.getBoundingClientRect();
+
   document.querySelectorAll('.point').forEach(point => {
-    const row = parseInt(point.style.gridRowStart) - 1;
-    const col = parseInt(point.style.gridColumnStart) - 1;
-    if (row === playerTop && col === playerLeft) {
-      point.remove(); // Remove the point from the grid
+    const pointBox = point.getBoundingClientRect();
+
+    const touching = (
+      playerBox.right > pointBox.left &&
+      playerBox.left < pointBox.right &&
+      playerBox.bottom > pointBox.top &&
+      playerBox.top < pointBox.bottom
+    );
+
+    if (touching) {
+      point.remove();
       score++;
-      scoreDisplay.textContent = score; // Update the score display
+      scoreDisplay.textContent = score;
     }
   });
 
-  // If there are no points left, end the game
   if (document.querySelectorAll('.point').length === 0) {
     saveHighScore();
     alert("You collected all the points! Game Over!");
